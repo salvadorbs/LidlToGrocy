@@ -1,0 +1,6 @@
+[submodule "3p/fptest"]
+	path = 3p/fptest
+	url = https://github.com/graemeg/fptest.git
+[submodule "3p/mORMot2"]
+	path = 3p/mORMot2
+	url = https://github.com/synopse/mORMot2.git
