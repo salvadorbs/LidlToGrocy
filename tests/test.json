@@ -1,0 +1,231 @@
+[
+    {
+        "id": "18002058220230112335639",
+        "barCode": "0888205833563902120123",
+        "sequenceNumber": "335639",
+        "workstation": "02",
+        "itemsLine": [
+            {
+                "currentUnitPrice": "0,75",
+                "quantity": "2",
+                "isWeight": false,
+                "originalAmount": "1,50",
+                "name": "MOUSSE BIO MELA BAN",
+                "taxGroupName": "A",
+                "codeInput": "4056489025856",
+                "discounts": [],
+                "deposit": null,
+                "giftSerialNumber": null
+            },
+            {
+                "currentUnitPrice": "0,75",
+                "quantity": "3",
+                "isWeight": false,
+                "originalAmount": "2,25",
+                "name": "MOUSSE BIO MELA",
+                "taxGroupName": "B",
+                "codeInput": "4056489037170",
+                "discounts": [],
+                "deposit": null,
+                "giftSerialNumber": null
+            },
+            {
+                "currentUnitPrice": "0,75",
+                "quantity": "3",
+                "isWeight": false,
+                "originalAmount": "2,25",
+                "name": "MOUSSE BIO MELA",
+                "taxGroupName": "C",
+                "codeInput": "4056489037170",
+                "discounts": [],
+                "deposit": null,
+                "giftSerialNumber": null
+            }
+        ],
+        "taxes": [
+            {
+                "taxGroupName": "A",
+                "percentage": "4,00",
+                "amount": "0,50",
+                "taxableAmount": "12,96",
+                "netAmount": "12,46"
+            },
+            {
+                "taxGroupName": "B",
+                "percentage": "10,00",
+                "amount": "5,29",
+                "taxableAmount": "58,14",
+                "netAmount": "52,85"
+            },
+            {
+                "taxGroupName": "C",
+                "percentage": "22,00",
+                "amount": "0,63",
+                "taxableAmount": "3,48",
+                "netAmount": "2,85"
+            }
+        ],
+        "totalTaxes": {
+            "totalAmount": "6,42",
+            "totalTaxableAmount": "74,58",
+            "totalNetAmount": "68,16"
+        },
+        "couponsUsed": [
+            {
+                "title": "Penne o Spaghetti",
+                "discount": "Gratis Speciale",
+                "block2Description": "Il Coupon \u00e8 valido dal 06/01/2023 al 13/01/2023. Per essere correttamente utilizzato, il coupon deve essere attivato prima dell'identificazione del cliente in cassa.<br/>L'identificazione avviene scansionando la propria carta fedelt\u00e0 digitale in cassa.<br/>Questo coupon non \u00e8 convertibile in denaro, non \u00e8 cedibile a terzi, pu\u00f2 essere utilizzato una sola volta, su un massimo di 1 articolo a scelta tra i prodotti presenti nel coupon e solo sul prodotto corretto, identificato nell\u2019app con il codice articolo.<br/>Le immagini hanno valore puramente illustrativo.&nbsp;&nbsp;<br/>I prezzi potrebbero variare localmente.<br/><br/>Penne rigate integrali 500g<br/>Codice articolo: 6014731<br/>Valore commerciale: 0,85\u20ac&nbsp;&nbsp;<br/><br/>Spaghetti integrali 500g<br/>Codice articolo: 6014727<br/>Valore commerciale: 0,85\u20ac&nbsp;&nbsp;"
+            },
+            {
+                "title": "Maxi hamburger",
+                "discount": "-20% sconto",
+                "block2Description": "La promozione \u00e8 valida dal 08/01/2023 al 15/01/2023, salvo esaurimento scorte.\u00a0<br/>I prezzi potrebbero variare localmente, pertanto quelli indicati fanno esclusivo riferimento al punto vendita da te selezionato come preferito.\u00a0<br/>Per essere correttamente utilizzato, il coupon deve essere attivato prima dell&#39;identificazione del cliente in cassa.\u00a0<br/>L&#39;identificazione avviene scansionando la propria carta fedelt\u00e0 digitale in cassa.\u00a0<br/>Le immagini hanno valore puramente illustrativo.\u00a0\u00a0<br/>Questo coupon non \u00e8 convertibile in denaro, non \u00e8 cedibile a terzi e pu\u00f2 essere utilizzato una sola volta."
+            },
+            {
+                "title": "Frollini",
+                "discount": "-20% sconto",
+                "block2Description": "La promozione \u00e8 valida dal 08/01/2023 al 15/01/2023, salvo esaurimento scorte.\u00a0<br/>I prezzi potrebbero variare localmente, pertanto quelli indicati fanno esclusivo riferimento al punto vendita da te selezionato come preferito.\u00a0<br/>Per essere correttamente utilizzato, il coupon deve essere attivato prima dell&#39;identificazione del cliente in cassa.\u00a0<br/>L&#39;identificazione avviene scansionando la propria carta fedelt\u00e0 digitale in cassa.\u00a0<br/>Le immagini hanno valore puramente illustrativo.\u00a0\u00a0<br/>Questo coupon non \u00e8 convertibile in denaro, non \u00e8 cedibile a terzi e pu\u00f2 essere utilizzato una sola volta."
+            }
+        ],
+        "returnedTickets": [],
+        "isFavorite": false,
+        "date": "2023-01-12T10:21:34",
+        "totalAmount": "74,58",
+        "totalAmountNumeric": 74.58,
+        "store": {
+            "id": "IT2058",
+            "name": "Osio Sotto (BG)",
+            "address": "Corso Europa snc",
+            "postalCode": "24046",
+            "locality": "Osio Sotto (BG)",
+            "schedule": ""
+        },
+        "currency": {
+            "code": "EUR",
+            "symbol": "\u20ac"
+        },
+        "payments": [
+            {
+                "type": "CreditCard",
+                "amount": "74,58",
+                "description": "Bancomat",
+                "roundingDifference": "0",
+                "foreignPayment": null,
+                "cardInfo": null,
+                "rawPaymentInformationHTML": "<pre><br>======COPIA CLIENTE======               <br> Num tel:+39 800 919024                 <br>          VISA                          <br>        ACQUISTO                        <br>       LIDL 2058                        <br>    CORSO EUROPA SNC                    <br>   24046 - OSIO SOTTO                   <br>                                        <br>Eser.    300868101523002                <br>A.I.I.C.     00000000004                <br>Data 12/01/23  Ora 10:23                <br>TML 93508505 STAN 002088                <br>Mod. Online     CTLS ICC                <br>AUT. 237389 OPER. 002175                <br>VISA CONTACTLESS                        <br>************0613    ****                <br>A.ID A0000000031010                     <br>APPL.         Visa Debit                <br>ATC 0247                                <br>TCC 380            TT 00                <br>TrCC 978     UN 2B62C24A                <br>TVR           0000000000                <br>A.R.Q.C.790B2A2666671A4A                <br>IAD 06011103A02000                      <br>                                        <br>   IMPORTO EUR 74,58                    <br>                                        <br>                                        <br>Transazione Autorizzata                 <br>                                        <br>  ARRIVEDERCI E GRAZIE                  <br> Cod. Commerc: 15292774                 <br>                                        <br>                                        <br>                                        <br></pre>"
+            }
+        ],
+        "tenderChange": [],
+        "fiscalDataAt": null,
+        "fiscalDataCZ": null,
+        "fiscalDataDe": null,
+        "isEmployee": false,
+        "linesScannedCount": 71,
+        "totalDiscount": "2,09",
+        "taxExemptTexts": "None",
+        "ustIdNr": null,
+        "languageCode": "it",
+        "operatorId": null,
+        "htmlPrintedReceipt": null,
+        "printedReceiptState": "PRINTED",
+        "isHtml": false,
+        "hasHtmlDocument": false
+    },
+    {
+        "id": "18002058620230106183858",
+        "barCode": "0888205818385806060123",
+        "sequenceNumber": "183858",
+        "workstation": "06",
+        "itemsLine": [
+            {
+                "currentUnitPrice": "0,99",
+                "quantity": "1",
+                "isWeight": false,
+                "originalAmount": "0,99",
+                "name": "SACCH.PATTUM. 25L",
+                "taxGroupName": "B",
+                "codeInput": "4056489118572",
+                "discounts": [],
+                "deposit": null,
+                "giftSerialNumber": null
+            },
+            {
+                "currentUnitPrice": "0,99",
+                "quantity": "1",
+                "isWeight": false,
+                "originalAmount": "0,99",
+                "name": "BARR. PER CANI MANZO",
+                "taxGroupName": "C",
+                "codeInput": "4056489655350",
+                "discounts": [],
+                "deposit": null,
+                "giftSerialNumber": null
+            }
+        ],
+        "taxes": [
+            {
+                "taxGroupName": "B",
+                "percentage": "10,00",
+                "amount": "0,72",
+                "taxableAmount": "7,87",
+                "netAmount": "7,15"
+            },
+            {
+                "taxGroupName": "C",
+                "percentage": "22,00",
+                "amount": "12,83",
+                "taxableAmount": "71,17",
+                "netAmount": "58,34"
+            }
+        ],
+        "totalTaxes": {
+            "totalAmount": "13,55",
+            "totalTaxableAmount": "79,04",
+            "totalNetAmount": "65,49"
+        },
+        "couponsUsed": [],
+        "returnedTickets": [],
+        "isFavorite": false,
+        "date": "2023-01-06T17:16:21",
+        "totalAmount": "79,04",
+        "totalAmountNumeric": 79.04,
+        "store": {
+            "id": "IT2058",
+            "name": "Osio Sotto (BG)",
+            "address": "Corso Europa snc",
+            "postalCode": "24046",
+            "locality": "Osio Sotto (BG)",
+            "schedule": ""
+        },
+        "currency": {
+            "code": "EUR",
+            "symbol": "\u20ac"
+        },
+        "payments": [
+            {
+                "type": "CreditCard",
+                "amount": "79,04",
+                "description": "Bancomat",
+                "roundingDifference": "0",
+                "foreignPayment": null,
+                "cardInfo": null,
+                "rawPaymentInformationHTML": "<pre><br>======COPIA CLIENTE======               <br>  Num tel:+39 800 024                   <br>          VISA                          <br>        ACQUISTO                        <br>       LIDL 2058                        <br>    CORSO EUROPA SNC                    <br>   24046 - OSIO SOTTO                   <br>                                        <br>Eser.    300868101523006                <br>A.I.I.C.     00000000004                <br>Data 06/01/23  Ora 17:17                <br>TML 93508509 STAN 073290                <br>Mod. Online     CTLS ICC                <br>AUT. 662239 OPER. 074420                <br>VISA CONTACTLESS                        <br>************0613    ****                <br>A.ID A0000000031010                     <br>APPL.         Visa Debit                <br>ATC 0245                                <br>TCC 380            TT 00                <br>TrCC 978     UN 2A59516F                <br>TVR           0000000000                <br>A.R.Q.C.CFB7DB9A3A4F23E0                <br>IAD 06011103A02000                      <br>                                        <br>   IMPORTO EUR 79,04                    <br>                                        <br>                                        <br>Transazione Autorizzata                 <br>                                        <br>  ARRIVEDERCI E GRAZIE                  <br> Cod. Commerc: 15292774                 <br>                                        <br>                                        <br>                                        <br></pre>"
+            }
+        ],
+        "tenderChange": [],
+        "fiscalDataAt": null,
+        "fiscalDataCZ": null,
+        "fiscalDataDe": null,
+        "isEmployee": false,
+        "linesScannedCount": 7,
+        "totalDiscount": "0",
+        "taxExemptTexts": "None",
+        "ustIdNr": null,
+        "languageCode": "it",
+        "operatorId": null,
+        "htmlPrintedReceipt": null,
+        "printedReceiptState": "PRINTED",
+        "isHtml": false,
+        "hasHtmlDocument": false
+    }
+]
