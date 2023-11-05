@@ -1,4 +1,4 @@
-unit json.payments;
+unit Json.Payments;
 
 {$mode DelphiUnicode}
 

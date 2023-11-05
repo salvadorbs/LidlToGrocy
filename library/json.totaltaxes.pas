@@ -1,4 +1,4 @@
-unit json.totaltaxes;
+unit Json.TotalTaxes;
 
 {$mode DelphiUnicode}
 

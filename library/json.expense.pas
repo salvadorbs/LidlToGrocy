@@ -1,18 +1,18 @@
-unit json.root;
+unit Json.Expense;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils, mormot.core.json, json.itemsline, json.couponsused,
-  json.payments, json.taxes, Generics.Collections, json.currency, json.store,
-  json.totaltaxes, json.tenderchange;
+  Classes, SysUtils, mormot.core.json, Json.ItemsLine, Json.CouponsUsed,
+  Json.Payments, Json.Taxes, Generics.Collections, Json.Currency, Json.Store,
+  Json.TotalTaxes, Json.TenderChange;
 
 type
-  { TRoot }
+  { TExpense }
 
-  TRoot = class(TSynAutoCreateFields)
+  TExpense = class(TSynAutoCreateFields)
   private
     FBarCode: string;
     FCouponsUsed: TCouponsUsedArray;
@@ -65,26 +65,13 @@ type
     property TotalDiscount: string read FTotalDiscount write FTotalDiscount;
     property TotalTaxes: TTotalTaxes read FTotalTaxes;
     property Workstation: string read FWorkstation write FWorkstation;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
   end;
 
-  TRootArray = array of TRoot;
+  TExpenseArray = array of TExpense;
 
 implementation
 
-{ TRoot }
-
-constructor TRoot.Create;
-begin
-  inherited Create;
-end;
-
-destructor TRoot.Destroy;
-begin
-  inherited Destroy;
-end;
+{ TExpense }
 
 end.
 

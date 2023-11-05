@@ -1,4 +1,4 @@
-unit json.store;
+unit Json.Store;
 
 {$mode DelphiUnicode}
 

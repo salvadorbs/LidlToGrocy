@@ -1,4 +1,4 @@
-unit json.currency;
+unit Json.Currency;
 
 {$mode DelphiUnicode}
 
