@@ -6,9 +6,7 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Classes, SysUtils, mormot.core.os, kernel.application, json.payments,
-json.currency, json.store, json.couponsused, json.totaltaxes, json.taxes,
-json.discounts, json.itemsline, json.root;
+  Classes, SysUtils, mormot.core.os, kernel.application;
 
 var
   Application: TLidlToGrocy;

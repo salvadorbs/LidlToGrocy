@@ -29,7 +29,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="library"/>
+            <OtherUnitFiles Value="library;service"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -116,8 +116,14 @@
         <UnitName Value="lidl.ItemsLine"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.root.pas"/>
+        <Filename Value="library\openfoodfacts.productinfo.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="OpenFoodFacts.ProductInfo"/>
+      </Unit>
+      <Unit>
+        <Filename Value="service\openfoodfacts.service.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="OpenFoodFacts.Service"/>
       </Unit>
     </Units>
   </ProjectOptions>
@@ -129,7 +135,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="library"/>
+      <OtherUnitFiles Value="library;service"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
