@@ -43,9 +43,14 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="testcase1.pas"/>
+        <Filename Value="tests\testcase.lidl.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="TestCase1"/>
+        <UnitName Value="Testcase.Lidl"/>
+      </Unit>
+      <Unit>
+        <Filename Value="tests\testcase.openfoodfacts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Testcase.OpenFoodFacts"/>
       </Unit>
     </Units>
   </ProjectOptions>
@@ -53,11 +58,11 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="testcase"/>
+      <Filename Value="bin\testcase"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\library"/>
+      <OtherUnitFiles Value="..\library;tests"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

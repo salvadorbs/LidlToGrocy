@@ -41,12 +41,15 @@ begin
 
   JData := GetJSON(JSON);
   JObject := JData as TJSONObject;
-
-  FCode := JObject.Get('code', '');
-  FStatus := JObject.Get('status', 0);
-  FStatusVerbose := JObject.Get('status_verbose', 'product not found');
-  FImageUrl := JObject.FindPath('product.image_url').AsString;
-  FProductName := JObject.FindPath('product.product_name').AsString;
+  try
+    FCode := JObject.Get('code', '');
+    FStatus := JObject.Get('status', 0);
+    FStatusVerbose := JObject.Get('status_verbose', 'product not found');
+    FImageUrl := JObject.FindPath('product.image_url').AsString;
+    FProductName := JObject.FindPath('product.product_name').AsString;
+  finally
+    JData.Free;
+  end;
 end;
 
 end.

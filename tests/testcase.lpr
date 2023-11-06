@@ -3,7 +3,7 @@ program testcase;
 {$mode objfpc}{$H+}
 
 uses
-  Interfaces, Forms, GUITestRunner, testcase1;
+  Interfaces, Forms, GUITestRunner, testcase.lidl, testcase.openfoodfacts;
 
 {$R *.res}
 

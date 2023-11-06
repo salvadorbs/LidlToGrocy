@@ -1,4 +1,4 @@
-unit TestCase1;
+unit Testcase.Lidl;
 
 {$mode DelphiUnicode}
 
@@ -6,13 +6,13 @@ interface
 
 uses
   Classes, SysUtils, TestFramework, mormot.core.json, mormot.core.os, mormot.core.base,
-  Json.Expense;
+  Lidl.Expense, OpenFoodFacts.ProductInfo;
 
 type
 
-  { TLidl }
+  { TTestCaseLidl }
 
-  TLidl = class(TTestCase)
+  TTestCaseLidl = class(TTestCase)
   private
     FExpense: TExpenseArray;
   protected
@@ -23,35 +23,25 @@ type
     procedure CheckItemsLine;
   end;
 
-  TOpenFoodFacts = class(TTestCase)
-  private
-  protected
-    procedure SetUp; override;
-    procedure TearDown; override;
-  published
-  end;
-
 implementation
 
-procedure TLidl.SetUp;
+procedure TTestCaseLidl.SetUp;
 var
   json: RawUtf8;
 begin
-  json := StringFromFile('test.json');
+  json := StringFromFile('test_lidl.json');
   DynArrayLoadJson(FExpense, json, TypeInfo(TExpenseArray));
 end;
 
-procedure TLidl.TearDown;
+procedure TTestCaseLidl.TearDown;
 var
   I: Integer;
 begin
   for I := 0 to length(FExpense) - 1 do
-  begin
     FExpense[I].Free;
-  end;
 end;
 
-procedure TLidl.ValidJsonObject;
+procedure TTestCaseLidl.ValidJsonObject;
 begin
   CheckEquals(Length(FExpense), 2);
 
@@ -59,7 +49,7 @@ begin
   CheckEqualsUnicodeString(FExpense[1].id, '2');
 end;
 
-procedure TLidl.CheckItemsLine;
+procedure TTestCaseLidl.CheckItemsLine;
 begin
   CheckEquals(Length(FExpense), 2);
 
@@ -79,6 +69,7 @@ begin
 end;
 
 initialization
-  RegisterTest(TLidl.Suite);
+  RegisterTest(TTestCaseLidl.Suite);
+
 end.
 
