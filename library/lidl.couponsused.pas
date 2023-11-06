@@ -1,14 +1,14 @@
-unit Json.CouponsUsed;
+unit lidl.CouponsUsed;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, mormot.core.json;
 
 type
-  TCouponsUsed = class
+  TCouponsUsed = class(TSynAutoCreateFields)
   private
     FBlock2Description: string;
     FDiscount: string;

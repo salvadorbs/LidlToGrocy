@@ -1,14 +1,14 @@
-unit Json.Currency;
+unit lidl.Currency;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, mormot.core.json;
 
 type
-  TCurrency = class
+  TCurrency = class(TSynAutoCreateFields)
   private
     FCode: string;
     FSymbol: string;

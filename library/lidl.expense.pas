@@ -1,13 +1,13 @@
-unit Json.Expense;
+unit lidl.Expense;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils, mormot.core.json, Json.ItemsLine, Json.CouponsUsed,
-  Json.Payments, Json.Taxes, Generics.Collections, Json.Currency, Json.Store,
-  Json.TotalTaxes, Json.TenderChange;
+  Classes, SysUtils, mormot.core.json, lidl.ItemsLine, lidl.CouponsUsed,
+  lidl.Payments, lidl.Taxes, Generics.Collections, lidl.Currency, lidl.Store,
+  lidl.TotalTaxes, lidl.TenderChange;
 
 type
   { TExpense }

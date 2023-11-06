@@ -1,14 +1,14 @@
-unit Json.TotalTaxes;
+unit lidl.TotalTaxes;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, mormot.core.json;
 
 type
-  TTotalTaxes = class
+  TTotalTaxes = class(TSynAutoCreateFields)
   private
     FTotalAmount: string;
     FTotalNetAmount: string;

@@ -1,4 +1,4 @@
-unit Json.TenderChange;
+unit lidl.TenderChange;
 
 {$mode DelphiUnicode}
 

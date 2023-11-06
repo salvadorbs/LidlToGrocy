@@ -1,14 +1,14 @@
-unit Json.Store;
+unit lidl.Store;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, mormot.core.json;
 
 type
-  TStore = class
+  TStore = class(TSynAutoCreateFields)
   private
     FAddress: string;
     FId: string;

@@ -10,9 +10,9 @@ uses
 
 type
 
-  { TLidlToGrocyTestCase }
+  { TLidl }
 
-  TLidlToGrocyTestCase = class(TTestCase)
+  TLidl = class(TTestCase)
   private
     FExpense: TExpenseArray;
   protected
@@ -23,9 +23,17 @@ type
     procedure CheckItemsLine;
   end;
 
+  TOpenFoodFacts = class(TTestCase)
+  private
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+  end;
+
 implementation
 
-procedure TLidlToGrocyTestCase.SetUp;
+procedure TLidl.SetUp;
 var
   json: RawUtf8;
 begin
@@ -33,7 +41,7 @@ begin
   DynArrayLoadJson(FExpense, json, TypeInfo(TExpenseArray));
 end;
 
-procedure TLidlToGrocyTestCase.TearDown;
+procedure TLidl.TearDown;
 var
   I: Integer;
 begin
@@ -43,7 +51,7 @@ begin
   end;
 end;
 
-procedure TLidlToGrocyTestCase.ValidJsonObject;
+procedure TLidl.ValidJsonObject;
 begin
   CheckEquals(Length(FExpense), 2);
 
@@ -51,7 +59,7 @@ begin
   CheckEqualsUnicodeString(FExpense[1].id, '2');
 end;
 
-procedure TLidlToGrocyTestCase.CheckItemsLine;
+procedure TLidl.CheckItemsLine;
 begin
   CheckEquals(Length(FExpense), 2);
 
@@ -71,6 +79,6 @@ begin
 end;
 
 initialization
-  RegisterTest(TLidlToGrocyTestCase.Suite);
+  RegisterTest(TLidl.Suite);
 end.
 

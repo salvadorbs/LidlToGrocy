@@ -1,14 +1,14 @@
-unit Json.Payments;
+unit lidl.Payments;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, mormot.core.json;
 
 type
-  TPayments = class
+  TPayments = class(TSynAutoCreateFields)
   private
     FAmount: string;
     FDescription: string;

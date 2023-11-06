@@ -76,37 +76,44 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.payments.pas"/>
+        <Filename Value="library\lidl.payments.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit1"/>
+        <UnitName Value="lidl.Payments"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.currency.pas"/>
+        <Filename Value="library\lidl.currency.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="lidl.Currency"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.store.pas"/>
+        <Filename Value="library\lidl.store.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="lidl.Store"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.couponsused.pas"/>
+        <Filename Value="library\lidl.couponsused.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="lidl.CouponsUsed"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.totaltaxes.pas"/>
+        <Filename Value="library\lidl.totaltaxes.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="lidl.TotalTaxes"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.taxes.pas"/>
+        <Filename Value="library\lidl.taxes.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="lidl.Taxes"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.discounts.pas"/>
+        <Filename Value="library\lidl.discounts.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="lidl.Discounts"/>
       </Unit>
       <Unit>
-        <Filename Value="library\json.itemsline.pas"/>
+        <Filename Value="library\lidl.itemsline.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="lidl.ItemsLine"/>
       </Unit>
       <Unit>
         <Filename Value="library\json.root.pas"/>
