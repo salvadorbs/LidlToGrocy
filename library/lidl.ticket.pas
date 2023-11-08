@@ -1,18 +1,18 @@
-unit lidl.Expense;
+unit Lidl.Ticket;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils, mormot.core.json, lidl.ItemsLine, lidl.CouponsUsed,
-  lidl.Payments, lidl.Taxes, Generics.Collections, lidl.Currency, lidl.Store,
-  lidl.TotalTaxes, lidl.TenderChange;
+  Classes, SysUtils, mormot.core.json, Lidl.ItemsLine, Lidl.CouponsUsed,
+  Lidl.Payments, Lidl.Taxes, Lidl.Currency, Lidl.Store, Lidl.TotalTaxes,
+  Lidl.TenderChange;
 
 type
-  { TExpense }
+  { TLidlTicket }
 
-  TExpense = class(TSynAutoCreateFields)
+  TLidlTicket = class(TSynAutoCreateFields)
   private
     FBarCode: string;
     FCouponsUsed: TCouponsUsedArray;
@@ -67,11 +67,11 @@ type
     property Workstation: string read FWorkstation write FWorkstation;
   end;
 
-  TExpenseArray = array of TExpense;
+  TLidlTicketArray = array of TLidlTicket;
 
 implementation
 
-{ TExpense }
+{ TLidlTicket }
 
 end.
 

@@ -1,4 +1,4 @@
-unit lidl.Store;
+unit Lidl.Store;
 
 {$mode DelphiUnicode}
 

@@ -1,4 +1,4 @@
-unit lidl.Taxes;
+unit Lidl.Taxes;
 
 {$mode DelphiUnicode}
 

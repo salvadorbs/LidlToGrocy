@@ -1,4 +1,4 @@
-unit lidl.CouponsUsed;
+unit Lidl.CouponsUsed;
 
 {$mode DelphiUnicode}
 

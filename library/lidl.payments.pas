@@ -1,4 +1,4 @@
-unit lidl.Payments;
+unit Lidl.Payments;
 
 {$mode DelphiUnicode}
 

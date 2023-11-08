@@ -1,4 +1,4 @@
-unit lidl.TenderChange;
+unit Lidl.TenderChange;
 
 {$mode DelphiUnicode}
 

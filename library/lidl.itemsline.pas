@@ -1,11 +1,11 @@
-unit lidl.ItemsLine;
+unit Lidl.ItemsLine;
 
 {$mode DelphiUnicode}
 
 interface
 
 uses
-  Classes, SysUtils, Generics.Collections, lidl.discounts, mormot.core.json, syncobjs;
+  Classes, SysUtils, Lidl.Discounts, mormot.core.json;
 
 type
 

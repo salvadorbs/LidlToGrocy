@@ -1,4 +1,4 @@
-unit lidl.Currency;
+unit Lidl.Currency;
 
 {$mode DelphiUnicode}
 
