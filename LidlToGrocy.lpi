@@ -83,12 +83,12 @@
       <Unit>
         <Filename Value="library\lidl.currency.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="lidl.Currency"/>
+        <UnitName Value="Lidl.Currency"/>
       </Unit>
       <Unit>
         <Filename Value="library\lidl.store.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="lidl.Store"/>
+        <UnitName Value="Lidl.Store"/>
       </Unit>
       <Unit>
         <Filename Value="library\lidl.couponsused.pas"/>
@@ -98,12 +98,12 @@
       <Unit>
         <Filename Value="library\lidl.totaltaxes.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="lidl.TotalTaxes"/>
+        <UnitName Value="Lidl.TotalTaxes"/>
       </Unit>
       <Unit>
         <Filename Value="library\lidl.taxes.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="lidl.Taxes"/>
+        <UnitName Value="Lidl.Taxes"/>
       </Unit>
       <Unit>
         <Filename Value="library\lidl.discounts.pas"/>
@@ -113,7 +113,7 @@
       <Unit>
         <Filename Value="library\lidl.itemsline.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="lidl.ItemsLine"/>
+        <UnitName Value="Lidl.ItemsLine"/>
       </Unit>
       <Unit>
         <Filename Value="library\openfoodfacts.productinfo.pas"/>
@@ -124,6 +124,26 @@
         <Filename Value="service\openfoodfacts.service.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="OpenFoodFacts.Service"/>
+      </Unit>
+      <Unit>
+        <Filename Value="service\grocy.service.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Grocy.Service"/>
+      </Unit>
+      <Unit>
+        <Filename Value="library\kernel.configuration.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Kernel.Configuration"/>
+      </Unit>
+      <Unit>
+        <Filename Value="library\grocy.product.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Grocy.Product"/>
+      </Unit>
+      <Unit>
+        <Filename Value="library\grocy.root.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Grocy.Root"/>
       </Unit>
     </Units>
   </ProjectOptions>
@@ -162,6 +182,12 @@
         <UseExternalDbgSyms Value="True"/>
       </Debugging>
     </Linking>
+    <Other>
+      <CompilerMessages>
+        <IgnoredMessages idx5024="True" idx4105="True" idx4104="True"/>
+      </CompilerMessages>
+      <CustomOptions Value="-FcUTF8"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions>

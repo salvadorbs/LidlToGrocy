@@ -1,6 +1,6 @@
 unit OpenFoodFacts.ProductInfo;
 
-{$mode Delphi}{$H+}
+{$mode DelphiUnicode}
 
 interface
 

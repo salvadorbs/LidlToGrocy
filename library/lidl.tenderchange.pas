@@ -5,10 +5,10 @@ unit Lidl.TenderChange;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, mormot.core.json;
 
 type
-  TTenderChange = class
+  TTenderChange = class(TSynAutoCreateFields)
   private
     FAmount: string;
     FRoundingDifference: string;

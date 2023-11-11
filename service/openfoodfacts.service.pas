@@ -1,6 +1,6 @@
 unit OpenFoodFacts.Service;
 
-{$mode Delphi}{$H+}
+{$mode DelphiUnicode}
 
 interface
 

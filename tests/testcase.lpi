@@ -43,12 +43,12 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="tests\testcase.lidl.pas"/>
+        <Filename Value="src\testcase.lidl.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Testcase.Lidl"/>
       </Unit>
       <Unit>
-        <Filename Value="tests\testcase.openfoodfacts.pas"/>
+        <Filename Value="src\testcase.openfoodfacts.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Testcase.OpenFoodFacts"/>
       </Unit>
