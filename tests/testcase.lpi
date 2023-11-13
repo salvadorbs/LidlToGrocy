@@ -52,6 +52,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Testcase.OpenFoodFacts"/>
       </Unit>
+      <Unit>
+        <Filename Value="src\testcase.grocy.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Testcase.Grocy"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

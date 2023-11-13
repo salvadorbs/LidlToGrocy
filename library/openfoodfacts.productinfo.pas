@@ -18,8 +18,10 @@ type
     FProductName: string;
     FStatus: Integer;
     FStatusVerbose: string;
+    function GetValueFromJson(JObject: TJSONObject; Field: String): String;
   public
-    constructor Create(JSON: String);
+    constructor Create(JSON: String); overload;
+    constructor Create(); overload;
   published
     property Code: string read FCode write FCode;
     property ImageUrl: string read FImageUrl write FImageUrl;
@@ -31,6 +33,17 @@ type
 implementation
 
 { TOFFProductInfo }
+
+function TOFFProductInfo.GetValueFromJson(JObject: TJSONObject; Field: String): String;
+var
+  pathImageUrl: TJSONData;
+begin
+  Result := '';
+
+  pathImageUrl := JObject.FindPath(Field);
+  if Assigned(pathImageUrl) then
+    Result := pathImageUrl.AsString;
+end;
 
 constructor TOFFProductInfo.Create(JSON: String);
 var
@@ -45,11 +58,16 @@ begin
     FCode := JObject.Get('code', '');
     FStatus := JObject.Get('status', 0);
     FStatusVerbose := JObject.Get('status_verbose', 'product not found');
-    FImageUrl := JObject.FindPath('product.image_url').AsString;
-    FProductName := JObject.FindPath('product.product_name').AsString;
+    FImageUrl := GetValueFromJson(JObject, 'product.image_url');
+    FProductName := GetValueFromJson(JObject, 'product.product_name');
   finally
     JData.Free;
   end;
+end;
+
+constructor TOFFProductInfo.Create();
+begin
+
 end;
 
 end.

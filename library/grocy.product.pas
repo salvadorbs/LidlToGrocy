@@ -5,7 +5,7 @@ unit Grocy.Product;
 interface
 
 uses
-  Classes, SysUtils, mormot.core.json;
+  Classes, SysUtils, mormot.core.json, mormot.core.rtti;
 
 type
 
@@ -16,66 +16,66 @@ type
     FActive: string;
     FCalories: string;
     FCumulateMinStockAmountOfSubProducts: string;
-    FDefaultBestBeforeDays: Integer;
+    FDefaultBestBeforeDays: String;
     FDefaultBestBeforeDaysAfterFreezing: string;
     FDefaultBestBeforeDaysAfterOpen: string;
-    FDefaultBestBeforeDaysAfterThawing: Integer;
-    FDefaultConsumeLocationId: Integer;
+    FDefaultBestBeforeDaysAfterThawing: String;
+    FDefaultConsumeLocationId: String;
     FDescription: string;
     FDueType: string;
     FEnableTareWeightHandling: string;
     FHideOnStockOverview: string;
-    FId: string;
-    FLocationId: Integer;
+    FId: Integer;
+    FLocationId: String;
     FMinStockAmount: string;
     FMoveOnOpen: string;
     FName: string;
     FNoOwnStock: string;
     FNotCheckStockFulfillmentForRecipes: string;
     FParentProductId: string;
-    FProductGroupId: Integer;
-    FQuIdConsume: Integer;
-    FQuIdPrice: Integer;
-    FQuIdPurchase: Integer;
-    FQuIdStock: Integer;
+    FProductGroupId: String;
+    FQuIdConsume: String;
+    FQuIdPrice: String;
+    FQuIdPurchase: String;
+    FQuIdStock: String;
     FQuickConsumeAmount: string;
     FQuickOpenAmount: string;
-    FShoppingLocationId: Integer;
+    FShoppingLocationId: String;
     FShouldNotBeFrozen: string;
     FTreatOpenedAsOutOfStock: string;
   public
     procedure DefaultSetup();
   published
-    property Active: string read FActive write FActive;
+  	property Active: string read FActive write FActive;
     property Calories: string read FCalories write FCalories;
-    property Cumulate_Min_Stock_Amount_Of_Sub_Products: string read FCumulateMinStockAmountOfSubProducts write FCumulateMinStockAmountOfSubProducts;
-    property Default_Best_Before_Days: Integer read FDefaultBestBeforeDays write FDefaultBestBeforeDays;
-    property Default_Best_Before_Days_After_Freezing: string read FDefaultBestBeforeDaysAfterFreezing write FDefaultBestBeforeDaysAfterFreezing;
-    property Default_Best_Before_Days_After_Open: string read FDefaultBestBeforeDaysAfterOpen write FDefaultBestBeforeDaysAfterOpen;
-    property Default_Best_Before_Days_After_Thawing: Integer read FDefaultBestBeforeDaysAfterThawing write FDefaultBestBeforeDaysAfterThawing;
-    property Default_Consume_Location_Id: Integer read FDefaultConsumeLocationId write FDefaultConsumeLocationId;
+    property CumulateMinStockAmountOfSubProducts: string read FCumulateMinStockAmountOfSubProducts write FCumulateMinStockAmountOfSubProducts;
+    property DefaultBestBeforeDays: String read FDefaultBestBeforeDays write FDefaultBestBeforeDays;
+    property DefaultBestBeforeDaysAfterFreezing: string read FDefaultBestBeforeDaysAfterFreezing write FDefaultBestBeforeDaysAfterFreezing;
+    property DefaultBestBeforeDaysAfterOpen: string read FDefaultBestBeforeDaysAfterOpen write FDefaultBestBeforeDaysAfterOpen;
+    property DefaultBestBeforeDaysAfterThawing: String read FDefaultBestBeforeDaysAfterThawing write FDefaultBestBeforeDaysAfterThawing;
+    property DefaultConsumeLocationId: String read FDefaultConsumeLocationId write FDefaultConsumeLocationId;
     property Description: string read FDescription write FDescription;
-    property Due_Type: string read FDueType write FDueType;
-    property Enable_Tare_Weight_Handling: string read FEnableTareWeightHandling write FEnableTareWeightHandling;
-    property Hide_On_Stock_Overview: string read FHideOnStockOverview write FHideOnStockOverview;
-    property Id: string read FId write FId;
-    property Location_Id: Integer read FLocationId write FLocationId;
-    property Min_Stock_Amount: string read FMinStockAmount write FMinStockAmount;
-    property Move_On_Open: string read FMoveOnOpen write FMoveOnOpen;
+    property DueType: string read FDueType write FDueType;
+    property EnableTareWeightHandling: string read FEnableTareWeightHandling write FEnableTareWeightHandling;
+    property HideOnStockOverview: string read FHideOnStockOverview write FHideOnStockOverview;
+    property Id: Integer read FId write FId default -1;
+    property LocationId: String read FLocationId write FLocationId;
+    property MinStockAmount: string read FMinStockAmount write FMinStockAmount;
+    property MoveOnOpen: string read FMoveOnOpen write FMoveOnOpen;
     property Name: string read FName write FName;
-    property No_Own_Stock: string read FNoOwnStock write FNoOwnStock;
-    property Not_Check_Stock_Fulfillment_For_Recipes: string read FNotCheckStockFulfillmentForRecipes write FNotCheckStockFulfillmentForRecipes;
-    property Parent_Product_Id: string read FParentProductId write FParentProductId;
-    property Product_Group_Id: Integer read FProductGroupId write FProductGroupId;
-    property Qu_Id_Consume: Integer read FQuIdConsume write FQuIdConsume;
-    property Qu_Id_Price: Integer read FQuIdPrice write FQuIdPrice;
-    property Qu_Id_Purchase: Integer read FQuIdPurchase write FQuIdPurchase;
-    property Qu_Id_Stock: Integer read FQuIdStock write FQuIdStock;
-    property Quick_Consume_Amount: string read FQuickConsumeAmount write FQuickConsumeAmount;
-    property Quick_Open_Amount: string read FQuickOpenAmount write FQuickOpenAmount;
-    property Shopping_Location_Id: Integer read FShoppingLocationId write FShoppingLocationId;
-    property Should_Not_Be_Frozen: string read FShouldNotBeFrozen write FShouldNotBeFrozen;
-    property Treat_Opened_As_Out_Of_Stock: string read FTreatOpenedAsOutOfStock write FTreatOpenedAsOutOfStock;
+    property NoOwnStock: string read FNoOwnStock write FNoOwnStock;
+    property NotCheckStockFulfillmentForRecipes: string read FNotCheckStockFulfillmentForRecipes write FNotCheckStockFulfillmentForRecipes;
+    property ParentProductId: string read FParentProductId write FParentProductId;
+    property ProductGroupId: String read FProductGroupId write FProductGroupId;
+    property QuIdConsume: String read FQuIdConsume write FQuIdConsume;
+    property QuIdPrice: String read FQuIdPrice write FQuIdPrice;
+    property QuIdPurchase: String read FQuIdPurchase write FQuIdPurchase;
+    property QuIdStock: String read FQuIdStock write FQuIdStock;
+    property QuickConsumeAmount: string read FQuickConsumeAmount write FQuickConsumeAmount;
+    property QuickOpenAmount: string read FQuickOpenAmount write FQuickOpenAmount;
+    property ShoppingLocationId: String read FShoppingLocationId write FShoppingLocationId;
+    property ShouldNotBeFrozen: string read FShouldNotBeFrozen write FShouldNotBeFrozen;
+    property TreatOpenedAsOutOfStock: string read FTreatOpenedAsOutOfStock write FTreatOpenedAsOutOfStock;
   end;
 
 implementation
@@ -93,6 +93,7 @@ begin
   FDueType := '1';
   FEnableTareWeightHandling := '0';
   FHideOnStockOverview := '0';
+  FId := -1;
   FMinStockAmount := '0';
   FMoveOnOpen := '0';
   FNoOwnStock := '0';
@@ -103,6 +104,28 @@ begin
   FShouldNotBeFrozen := '0';
   FTreatOpenedAsOutOfStock := '1';
 end;
+
+initialization
+  Rtti.ByTypeInfo[TypeInfo(TGrocyProduct)].Props.NameChanges(
+    ['Active', 'Calories', 'CumulateMinStockAmountOfSubProducts',
+    'DefaultBestBeforeDays', 'DefaultBestBeforeDaysAfterFreezing',
+    'DefaultBestBeforeDaysAfterOpen', 'DefaultBestBeforeDaysAfterThawing',
+    'DefaultConsumeLocationId', 'Description', 'DueType', 'EnableTareWeightHandling',
+    'HideOnStockOverview', 'Id', 'LocationId', 'MinStockAmount',
+    'MoveOnOpen', 'Name', 'NoOwnStock', 'NotCheckStockFulfillmentForRecipes',
+    'ParentProductId', 'ProductGroupId', 'QuIdConsume', 'QuIdPrice',
+    'QuIdPurchase', 'QuIdStock', 'QuickConsumeAmount', 'QuickOpenAmount',
+    'ShoppingLocationId', 'ShouldNotBeFrozen', 'TreatOpenedAsOutOfStock'],
+    ['active', 'calories', 'cumulate_min_stock_amount_of_sub_products',
+    'default_best_before_days', 'default_best_before_days_after_freezing',
+    'default_best_before_days_after_open', 'default_best_before_days_after_thawing',
+    'default_consume_location_id', 'description', 'due_type',
+    'enable_tare_weight_handling', 'hide_on_stock_overview', 'id',
+    'location_id', 'min_stock_amount', 'move_on_open', 'name', 'no_own_stock',
+    'not_check_stock_fulfillment_for_recipes', 'parent_product_id',
+    'product_group_id', 'qu_id_consume', 'qu_id_price', 'qu_id_purchase',
+    'qu_id_stock', 'quick_consume_amount', 'quick_open_amount',
+    'shopping_location_id', 'should_not_be_frozen', 'treat_opened_as_out_of_stock']);
 
 end.
 

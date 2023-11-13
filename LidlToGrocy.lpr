@@ -32,6 +32,7 @@ begin
     Application.Verbose := Option(['v', 'verbose'], 'generate verbose output');
     //Application.SaveSettings := Option(['s', 'save-params'], 'save parameters in settings.json');
     Application.Help := Option(['?', 'help'], 'display this message');
+    Application.NoStock := Option(['n', 'no-add-stock'], 'don''t add product in stock');
 
     Application.GrocyIp := GetEx(['i', 'grocy-ip'], 'grocy ip address');
     Application.GrocyPort := GetEx(['p', 'grocy-port'], 'grocy port', '9283');

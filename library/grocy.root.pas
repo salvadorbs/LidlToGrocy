@@ -5,7 +5,7 @@ unit Grocy.Root;
 interface
 
 uses
-  Classes, SysUtils, mormot.core.json, Grocy.Product;
+  Classes, SysUtils, mormot.core.json, Grocy.Product, mormot.core.rtti;
 
 type
   { TGrocyRoot }
@@ -18,6 +18,11 @@ type
   end;
 
 implementation
+
+initialization
+  Rtti.ByTypeInfo[TypeInfo(TGrocyRoot)].Props.NameChanges(
+    ['Product'],
+    ['product']);
 
 end.
 

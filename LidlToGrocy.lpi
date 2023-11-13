@@ -145,6 +145,16 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Grocy.Root"/>
       </Unit>
+      <Unit>
+        <Filename Value="library\grocy.barcode.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Grocy.Barcode"/>
+      </Unit>
+      <Unit>
+        <Filename Value="library\grocy.productstock.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Grocy.ProductStock"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -199,6 +209,9 @@
       </Item>
       <Item>
         <Name Value="EFOpenError"/>
+      </Item>
+      <Item>
+        <Name Value="EHTTPClient"/>
       </Item>
     </Exceptions>
   </Debugging>
