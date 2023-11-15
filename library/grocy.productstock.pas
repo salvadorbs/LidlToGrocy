@@ -20,7 +20,7 @@ type
     FTransactionType: string;
   public
     constructor Create(Amount: string; BestBeforeDate: TDateTime;
-      Price: string; TransactionType: string; PurchasedDate: TDateTime);
+      Price: string; TransactionType: string; PurchasedDate: TDateTime); overload;
   published
     property Amount: string read FAmount write FAmount;
     property BestBeforeDate: TDateTime read FBestBeforeDate write FBestBeforeDate;
@@ -36,6 +36,7 @@ implementation
 constructor TGrocyProductStock.Create(Amount: string; BestBeforeDate: TDateTime;
   Price: string; TransactionType: string; PurchasedDate: TDateTime);
 begin
+  inherited Create;
   FAmount := Amount;
   FBestBeforeDate := Trunc(BestBeforeDate);
   FPrice := StringReplace(Price, ',', '.', [rfReplaceAll]);;

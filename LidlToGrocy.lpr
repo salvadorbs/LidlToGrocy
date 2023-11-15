@@ -12,6 +12,9 @@ uses
 var
   Application: TLidlToGrocy;
 
+const
+  VERSION = '0.1';
+
 function GetEx(const Name: array of RawUtf8; Description: RawUtf8; Default: RawUtf8 = ''): String;
 var
   Arg: RawUtf8;
@@ -25,14 +28,14 @@ end;
 begin
   with Executable.Command do
   begin
-    ExeDescription := 'An executable to add easily your Lidl receipts into Grocy';
+    ExeDescription := 'An executable to add easily your Lidl receipts into Grocy' + '[!!!UNSTABLE!!!]';
 
     Application := TLidlToGrocy.Create(nil);
 
     Application.Verbose := Option(['v', 'verbose'], 'generate verbose output');
-    //Application.SaveSettings := Option(['s', 'save-params'], 'save parameters in settings.json');
     Application.Help := Option(['?', 'help'], 'display this message');
     Application.NoStock := Option(['n', 'no-add-stock'], 'don''t add product in stock');
+    Application.NoOpenFoodFacts := Option(['c', 'no-call-openfoodfacts'], 'don''t get product infos from openfoodfacts');
 
     Application.GrocyIp := GetEx(['i', 'grocy-ip'], 'grocy ip address');
     Application.GrocyPort := GetEx(['p', 'grocy-port'], 'grocy port', '9283');
@@ -44,7 +47,7 @@ begin
 
     Application.LidlJsonFilePath := GetEx(['f', 'lidl-filepath'], 'lidl json file (optional)');
 
-    Application.Title := 'LidlToGrocy';
+    Application.Title := 'LidlToGrocy ' + VERSION;
 
     Application.SetupGrocy;
 

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, mormot.core.os, CustApp, Lidl.Ticket, Kernel.Configuration,
   OpenFoodFacts.ProductInfo, Lidl.ItemsLine, mormot.core.json, mormot.core.base,
-  Grocy.Service, Grocy.Barcode, Grocy.Product, Grocy.Root;
+  Grocy.Service, Grocy.Barcode, Grocy.Product;
 
 type
 
@@ -17,17 +17,18 @@ type
 
   TLidlToGrocy = class(TCustomApplication)
   private
-    FGrocyApiKey: String;
-    FGrocyIp: String;
-    FGrocyPort: String;
-    FHelp: Boolean;
-    FLidlJsonFilePath: String;
-    FLidlCountry: String;
-    FLidlLanguage: String;
-    FLidlToken: String;
-    FNoStock: Boolean;
+    FGrocyApiKey: string;
+    FGrocyIp: string;
+    FGrocyPort: string;
+    FHelp: boolean;
+    FLidlJsonFilePath: string;
+    FLidlCountry: string;
+    FLidlLanguage: string;
+    FLidlToken: string;
+    FNoOpenFoodFacts: boolean;
+    FNoStock: boolean;
     FOnHelp: TNotifyEvent;
-    FVerbose: Boolean;
+    FVerbose: boolean;
     FLidlJson: RawUTf8;
     FLidlTickets: TLidlTicketArray;
     FConfiguration: TConfiguration;
@@ -37,10 +38,12 @@ type
       const GrocyProduct: TGrocyProduct; const LidlTicket: TLidlTicket);
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
-    function CreateGrocyBarcode(const ProductId: Integer; const Barcode: String
-      ): TGrocyBarcode;
+    function CreateGrocyBarcode(const ProductId: integer;
+      const Barcode: string): TGrocyBarcode;
     procedure DoHelp(Sender: TObject);
-    function GetLidlTickets: String;
+    function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
+    function GetLidlTickets: string;
+    function GetOFFProductInfo(var LidlProduct: TItemsLine): TOFFProductInfo;
   protected
     procedure DoRun; override;
   public
@@ -49,40 +52,57 @@ type
 
     procedure SetupGrocy;
 
-    property Verbose: Boolean read FVerbose write FVerbose;
-    property Help: Boolean read FHelp write FHelp;
-    property NoStock: Boolean read FNoStock write FNoStock;
+    property Verbose: boolean read FVerbose write FVerbose;
+    property Help: boolean read FHelp write FHelp;
+    property NoStock: boolean read FNoStock write FNoStock;
+    property NoOpenFoodFacts: boolean read FNoOpenFoodFacts write FNoOpenFoodFacts;
 
-    property GrocyIp: String read FGrocyIp write FGrocyIp;
-    property GrocyPort: String read FGrocyPort write FGrocyPort;
-    property GrocyApiKey: String read FGrocyApiKey write FGrocyApiKey;
+    property GrocyIp: string read FGrocyIp write FGrocyIp;
+    property GrocyPort: string read FGrocyPort write FGrocyPort;
+    property GrocyApiKey: string read FGrocyApiKey write FGrocyApiKey;
 
-    property LidlCountry: String read FLidlCountry write FLidlCountry;
-    property LidlLanguage: String read FLidlLanguage write FLidlLanguage;
-    property LidlToken: String read FLidlToken write FLidlToken;
+    property LidlCountry: string read FLidlCountry write FLidlCountry;
+    property LidlLanguage: string read FLidlLanguage write FLidlLanguage;
+    property LidlToken: string read FLidlToken write FLidlToken;
 
-    property LidlJsonFilePath: String read FLidlJsonFilePath write FLidlJsonFilePath;
+    property LidlJsonFilePath: string read FLidlJsonFilePath write FLidlJsonFilePath;
 
     property OnHelp: TNotifyEvent read FOnHelp write FOnHelp;
   end;
 
 const
-  LIDL_PLUS_COMMANDLINE = 'lidl-plus --language=%s --country=%s --refresh-token=%s receipt --all';
+  LIDL_PLUS_COMMANDLINE =
+    'lidl-plus --language=%s --country=%s --refresh-token=%s receipt --all';
 
 implementation
 
 uses
   OpenFoodFacts.Service, Grocy.ProductStock, DateUtils;
 
-{ TGrocyFastLidlAdder }
+  { TGrocyFastLidlAdder }
 
 procedure TLidlToGrocy.DoHelp(Sender: TObject);
 begin
   ConsoleWrite(Executable.Command.FullDescription);
 end;
 
-function TLidlToGrocy.CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo
-  ): TGrocyProduct;
+function TLidlToGrocy.GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
+var
+  GrocyProduct: TGrocyProduct;
+begin
+  GrocyProduct := nil;
+  try
+    GrocyProduct := FGrocyService.GetProductByBarcode(LidlProduct.CodeInput);
+  except
+    //In case of product doesn't exists in Grocy
+    GrocyProduct := AddNewGrocyProduct(LidlProduct);
+  end;
+
+  Result := GrocyProduct;
+end;
+
+function TLidlToGrocy.CreateGrocyProduct(
+  const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
 var
   GrocyProduct: TGrocyProduct;
 begin
@@ -93,35 +113,33 @@ begin
     GrocyProduct.DefaultSetup();
 
     GrocyProduct.Name := OFFProductInfo.ProductName;
-    GrocyProduct.DefaultBestBeforeDays := IntToStr(FConfiguration.GrocyDefaultBestBeforeDays);
-    GrocyProduct.DefaultBestBeforeDaysAfterThawing := IntToStr(FConfiguration.GrocyDefaultBestBeforeDaysAfterThawing);
-    GrocyProduct.DefaultConsumeLocationId := IntToStr(FConfiguration.GrocyDefaultConsumeLocation);
-    GrocyProduct.LocationId := IntToStr(FConfiguration.GrocyLocationId);
-    GrocyProduct.QuIdConsume := IntToStr(FConfiguration.GrocyQuIdConsume);
-    GrocyProduct.QuIdPrice := IntToStr(FConfiguration.GrocyQuIdPrice);
-    GrocyProduct.QuIdPurchase := IntToStr(FConfiguration.GrocyQuIdPurchase);
-    GrocyProduct.QuIdStock := IntToStr(FConfiguration.GrocyQuIdStock);
-    GrocyProduct.ShoppingLocationId := IntToStr(FConfiguration.GrocyShoppingLocationId);
+    with FConfiguration do
+    begin
+      Result.Name := OFFProductInfo.ProductName;
+      Result.DefaultBestBeforeDays := IntToStr(GrocyDefaultBestBeforeDays);
+      Result.DefaultBestBeforeDaysAfterThawing := IntToStr(GrocyDefaultBestBeforeDaysAfterThawing);
+      Result.DefaultConsumeLocationId := IntToStr(GrocyDefaultConsumeLocation);
+      Result.LocationId := IntToStr(GrocyLocationId);
+      Result.QuIdConsume := IntToStr(GrocyQuIdConsume);
+      Result.QuIdPrice := IntToStr(GrocyQuIdPrice);
+      Result.QuIdPurchase := IntToStr(GrocyQuIdPurchase);
+      Result.QuIdStock := IntToStr(GrocyQuIdStock);
+      Result.ShoppingLocationId := IntToStr(GrocyShoppingLocationId);
+    end;
   finally
     Result := GrocyProduct;
   end;
 end;
 
-function TLidlToGrocy.AddNewGrocyProduct(LidlProduct: TItemsLine
-  ): TGrocyProduct;
+function TLidlToGrocy.AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
 var
   GrocyBarcode: TGrocyBarcode;
   OFFProductInfo: TOFFProductInfo;
   GrocyProduct: TGrocyProduct;
 begin
-  try
-    OFFProductInfo := TOpenFoodFactsService.GetProduct(LidlProduct.CodeInput);
-  except
-    OFFProductInfo := TOFFProductInfo.Create();
-  end;
-
-  if (OFFProductInfo.ProductName = '') then
-    OFFProductInfo.ProductName := LidlProduct.Name;
+  OFFProductInfo := GetOFFProductInfo(LidlProduct);
+  GrocyProduct := nil;
+  GrocyBarcode := nil;
 
   try
     GrocyProduct := CreateGrocyProduct(OFFProductInfo);
@@ -133,6 +151,7 @@ begin
     OFFProductInfo.Free;
     GrocyBarcode.Free;
   end;
+
   Result := GrocyProduct;
 end;
 
@@ -141,9 +160,11 @@ procedure TLidlToGrocy.AddGrocyProductInStock(const LidlProduct: TItemsLine;
 var
   GrocyProductStock: TGrocyProductStock;
 begin
-  if not(FNoStock) then
+  if not (FNoStock) then
   begin
-    GrocyProductStock := TGrocyProductStock.Create(LidlProduct.Quantity, IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays), LidlProduct.CurrentUnitPrice, 'purchase', LidlTicket.Date);
+    GrocyProductStock := TGrocyProductStock.Create(LidlProduct.Quantity,
+      IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays),
+      LidlProduct.CurrentUnitPrice, 'purchase', LidlTicket.Date);
     try
       FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock);
     finally
@@ -152,8 +173,8 @@ begin
   end;
 end;
 
-function TLidlToGrocy.CreateGrocyBarcode(const ProductId: Integer;
-  const Barcode: String): TGrocyBarcode;
+function TLidlToGrocy.CreateGrocyBarcode(const ProductId: integer;
+  const Barcode: string): TGrocyBarcode;
 var
   GrocyBarcode: TGrocyBarcode;
 begin
@@ -172,23 +193,50 @@ begin
   end;
 end;
 
-function TLidlToGrocy.GetLidlTickets(): String;
+function TLidlToGrocy.GetLidlTickets(): string;
 var
-  output: String;
+  output: string;
 begin
   Result := '';
   if (FLidlToken <> '') then
   begin
-    output := RunRedirect(Format(LIDL_PLUS_COMMANDLINE, [FLidlLanguage, FLidlCountry, FLidlToken]));
+    output := RunRedirect(Format(LIDL_PLUS_COMMANDLINE,
+      [FLidlLanguage, FLidlCountry, FLidlToken]));
     if output <> '' then
     begin
       //TODO throw error and terminate
       Result := output;
     end;
   end
-  else begin
+  else
+  begin
     //TODO throw error and terminate
   end;
+end;
+
+function TLidlToGrocy.GetOFFProductInfo(var LidlProduct: TItemsLine): TOFFProductInfo;
+var
+  OFFProductInfo: TOFFProductInfo;
+begin
+  OFFProductInfo := nil;
+  if not NoOpenFoodFacts then
+  begin
+    try
+      OFFProductInfo := TOpenFoodFactsService.GetProduct(LidlProduct.CodeInput);
+    except
+    end;
+  end;
+
+  if OFFProductInfo = nil then
+    OFFProductInfo := TOFFProductInfo.Create();
+
+  // I manually enter the name in these two cases:
+  // - In case of valid code, but product not found, OFF returns 404 with error message
+  // - In case of invalid code, OFF returns 200 with error message, so .ProductName will be blank
+  if OFFProductInfo.ProductName = '' then
+    OFFProductInfo.ProductName := LidlProduct.Name;
+
+  Result := OFFProductInfo;
 end;
 
 procedure TLidlToGrocy.DoRun;
@@ -196,7 +244,6 @@ var
   LidlTicket: TLidlTicket;
   GrocyProduct: TGrocyProduct;
   LidlProduct: TItemsLine;
-  GrocyRoot: TGrocyRoot;
 begin
   if (FLidlJsonFilePath <> '') and FileExists(FLidlJsonFilePath) then
     FLidlJson := StringFromFile(FLidlJsonFilePath)
@@ -209,22 +256,14 @@ begin
   begin
     for LidlProduct in LidlTicket.ItemsLine do
     begin
-      GrocyRoot := nil;
       GrocyProduct := nil;
       try
-        try
-          GrocyRoot := FGrocyService.GetProductByBarcode(LidlProduct.CodeInput);
-          GrocyProduct := GrocyRoot.Product;
-        except
-          GrocyProduct := AddNewGrocyProduct(LidlProduct);
-        end;
+        GrocyProduct := GetGrocyProduct(LidlProduct);
 
         if Assigned(GrocyProduct) then
-           AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket);
+          AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket);
       finally
-        if Assigned(GrocyRoot) then
-          GrocyRoot.Free
-        else if Assigned(GrocyProduct) then
+        if Assigned(GrocyProduct) then
           GrocyProduct.Free;
       end;
     end;
@@ -236,7 +275,7 @@ begin
   //    FOnHelp(Self)
   //  else
   //    TOpenFoodFactsService.GetProduct('3017620422003');
-  //
+
   //  Executable.Command.ConsoleWriteUnknown();
   //end
   //else
@@ -249,7 +288,7 @@ end;
 constructor TLidlToGrocy.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
-  StopOnException:=True;
+  StopOnException := True;
 
   Self.FOnHelp := DoHelp;
 
@@ -262,7 +301,7 @@ end;
 
 destructor TLidlToGrocy.Destroy;
 var
-  I: Integer;
+  I: integer;
 begin
   if Assigned(FLidlTickets) then
   begin
@@ -283,4 +322,3 @@ begin
 end;
 
 end.
-

@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Grocy.Product, mormot.core.json, fphttpclient,
-  opensslsockets, mormot.core.os, mormot.core.text, mormot.core.base,
-  Grocy.Barcode, Grocy.ProductStock, Grocy.Root;
+  opensslsockets, mormot.core.os, mormot.core.Text, mormot.core.base,
+  Grocy.Barcode, Grocy.ProductStock;
 
 type
 

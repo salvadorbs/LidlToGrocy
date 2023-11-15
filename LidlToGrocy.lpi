@@ -141,11 +141,6 @@
         <UnitName Value="Grocy.Product"/>
       </Unit>
       <Unit>
-        <Filename Value="library\grocy.root.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Grocy.Root"/>
-      </Unit>
-      <Unit>
         <Filename Value="library\grocy.barcode.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Grocy.Barcode"/>
