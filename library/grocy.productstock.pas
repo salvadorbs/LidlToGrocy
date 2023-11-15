@@ -38,7 +38,7 @@ constructor TGrocyProductStock.Create(Amount: string; BestBeforeDate: TDateTime;
 begin
   FAmount := Amount;
   FBestBeforeDate := Trunc(BestBeforeDate);
-  FPrice := Price;
+  FPrice := StringReplace(Price, ',', '.', [rfReplaceAll]);;
   FTransactionType := TransactionType;
   FPurchasedDate := Trunc(PurchasedDate);
 end;

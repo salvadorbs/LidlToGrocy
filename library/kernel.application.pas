@@ -118,8 +118,10 @@ begin
     OFFProductInfo := TOpenFoodFactsService.GetProduct(LidlProduct.CodeInput);
   except
     OFFProductInfo := TOFFProductInfo.Create();
-    OFFProductInfo.ProductName := LidlProduct.Name;
   end;
+
+  if (OFFProductInfo.ProductName = '') then
+    OFFProductInfo.ProductName := LidlProduct.Name;
 
   try
     GrocyProduct := CreateGrocyProduct(OFFProductInfo);
@@ -221,7 +223,9 @@ begin
            AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket);
       finally
         if Assigned(GrocyRoot) then
-          GrocyRoot.Free;
+          GrocyRoot.Free
+        else if Assigned(GrocyProduct) then
+          GrocyProduct.Free;
       end;
     end;
   end;
@@ -260,15 +264,17 @@ destructor TLidlToGrocy.Destroy;
 var
   I: Integer;
 begin
-  inherited Destroy;
-
   if Assigned(FLidlTickets) then
   begin
     for I := 0 to length(FLidlTickets) - 1 do
       FLidlTickets[I].Free;
+    SetLength(FLidlTickets, 0);
   end;
 
+  FConfiguration.Free;
   FGrocyService.Free;
+
+  inherited Destroy;
 end;
 
 procedure TLidlToGrocy.SetupGrocy;
