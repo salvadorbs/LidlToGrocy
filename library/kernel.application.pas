@@ -34,12 +34,11 @@ type
     FConfiguration: TConfiguration;
     FGrocyService: TGrocyService;
 
-    procedure AddGrocyProductInStock(const LidlProduct: TItemsLine;
-      const GrocyProduct: TGrocyProduct; const LidlTicket: TLidlTicket);
+    procedure AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
+      const LidlTicket: TLidlTicket);
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
-    function CreateGrocyBarcode(const ProductId: integer;
-      const Barcode: string): TGrocyBarcode;
+    function CreateGrocyBarcode(const ProductId: integer; const Barcode: string): TGrocyBarcode;
     procedure DoHelp(Sender: TObject);
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function GetLidlTickets: string;
@@ -101,8 +100,7 @@ begin
   Result := GrocyProduct;
 end;
 
-function TLidlToGrocy.CreateGrocyProduct(
-  const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
+function TLidlToGrocy.CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
 var
   GrocyProduct: TGrocyProduct;
 begin
@@ -163,8 +161,8 @@ begin
   if not (FNoStock) then
   begin
     GrocyProductStock := TGrocyProductStock.Create(LidlProduct.Quantity,
-      IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays),
-      LidlProduct.CurrentUnitPrice, 'purchase', LidlTicket.Date);
+      IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays), LidlProduct.CurrentUnitPrice,
+      'purchase', LidlTicket.Date);
     try
       FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock);
     finally
@@ -173,8 +171,7 @@ begin
   end;
 end;
 
-function TLidlToGrocy.CreateGrocyBarcode(const ProductId: integer;
-  const Barcode: string): TGrocyBarcode;
+function TLidlToGrocy.CreateGrocyBarcode(const ProductId: integer; const Barcode: string): TGrocyBarcode;
 var
   GrocyBarcode: TGrocyBarcode;
 begin
@@ -200,8 +197,7 @@ begin
   Result := '';
   if (FLidlToken <> '') then
   begin
-    output := RunRedirect(Format(LIDL_PLUS_COMMANDLINE,
-      [FLidlLanguage, FLidlCountry, FLidlToken]));
+    output := RunRedirect(Format(LIDL_PLUS_COMMANDLINE, [FLidlLanguage, FLidlCountry, FLidlToken]));
     if output <> '' then
     begin
       //TODO throw error and terminate

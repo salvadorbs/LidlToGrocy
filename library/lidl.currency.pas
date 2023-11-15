@@ -1,4 +1,4 @@
-unit Lidl.Currency;
+unit Lidl.currency;
 
 {$mode DelphiUnicode}
 
@@ -20,4 +20,3 @@ type
 implementation
 
 end.
-

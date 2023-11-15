@@ -16,7 +16,7 @@ type
     FCodeInput: string;
     FCurrentUnitPrice: string;
     FDiscounts: TDiscountsArray;
-    FIsWeight: Boolean;
+    FIsWeight: boolean;
     FName: string;
     FOriginalAmount: string;
     FQuantity: string;
@@ -25,7 +25,7 @@ type
     property CodeInput: string read FCodeInput write FCodeInput;
     property CurrentUnitPrice: string read FCurrentUnitPrice write FCurrentUnitPrice;
     property Discounts: TDiscountsArray read FDiscounts;
-    property IsWeight: Boolean read FIsWeight write FIsWeight;
+    property IsWeight: boolean read FIsWeight write FIsWeight;
     property Name: string read FName write FName;
     property OriginalAmount: string read FOriginalAmount write FOriginalAmount;
     property Quantity: string read FQuantity write FQuantity;
@@ -46,4 +46,3 @@ begin
 end;
 
 end.
-

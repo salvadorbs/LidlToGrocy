@@ -25,8 +25,7 @@ type
     property Note: string read FNote write FNote;
     property ProductId: integer read FProductId write FProductId;
     property QuId: string read FQuId write FQuId;
-    property ShoppingLocationId: integer read FShoppingLocationId
-      write FShoppingLocationId;
+    property ShoppingLocationId: integer read FShoppingLocationId write FShoppingLocationId;
   end;
 
 implementation

@@ -16,17 +16,17 @@ type
     FCode: string;
     FImageUrl: string;
     FProductName: string;
-    FStatus: Integer;
+    FStatus: integer;
     FStatusVerbose: string;
-    function GetValueFromJson(JObject: TJSONObject; Field: String): String;
+    function GetValueFromJson(JObject: TJSONObject; Field: string): string;
   public
-    constructor Create(JSON: String); overload;
+    constructor Create(JSON: string); overload;
     constructor Create(); overload;
   published
     property Code: string read FCode write FCode;
     property ImageUrl: string read FImageUrl write FImageUrl;
     property ProductName: string read FProductName write FProductName;
-    property Status: Integer read FStatus write FStatus;
+    property Status: integer read FStatus write FStatus;
     property StatusVerbose: string read FStatusVerbose write FStatusVerbose;
   end;
 
@@ -34,7 +34,7 @@ implementation
 
 { TOFFProductInfo }
 
-function TOFFProductInfo.GetValueFromJson(JObject: TJSONObject; Field: String): String;
+function TOFFProductInfo.GetValueFromJson(JObject: TJSONObject; Field: string): string;
 var
   pathImageUrl: TJSONData;
 begin
@@ -45,7 +45,7 @@ begin
     Result := pathImageUrl.AsString;
 end;
 
-constructor TOFFProductInfo.Create(JSON: String);
+constructor TOFFProductInfo.Create(JSON: string);
 var
   JObject: TJSONObject;
   JData: TJSONData;
@@ -71,4 +71,3 @@ begin
 end;
 
 end.
-

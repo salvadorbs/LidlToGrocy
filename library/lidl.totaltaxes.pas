@@ -22,4 +22,3 @@ type
 implementation
 
 end.
-

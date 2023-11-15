@@ -14,18 +14,19 @@ type
   TOpenFoodFactsService = class
   private
   public
-    class function GetProduct(BarCode: String): TOFFProductInfo;
+    class function GetProduct(BarCode: string): TOFFProductInfo;
   end;
 
 const
-  BaseUrl: String = 'https://it.openfoodfacts.org/api/v2/product/';
+  BaseUrl: string = 'https://it.openfoodfacts.org/api/v2/product/';
 
 implementation
 
-class function TOpenFoodFactsService.GetProduct(BarCode: String): TOFFProductInfo;
+class function TOpenFoodFactsService.GetProduct(BarCode: string): TOFFProductInfo;
 var
   Client: TFPHttpClient;
   Response: string;
+  OFFProductInfo: TOFFProductInfo;
 begin
   Result := nil;
 

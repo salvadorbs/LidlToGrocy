@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, mormot.core.json, Lidl.ItemsLine, Lidl.CouponsUsed,
-  Lidl.Payments, Lidl.Taxes, Lidl.Currency, Lidl.Store, Lidl.TotalTaxes,
+  Lidl.Payments, Lidl.Taxes, Lidl.currency, Lidl.Store, Lidl.TotalTaxes,
   Lidl.TenderChange;
 
 type
@@ -18,15 +18,15 @@ type
     FCouponsUsed: TCouponsUsedArray;
     FCurrency: TCurrency;
     FDate: TDateTime;
-    FHasHtmlDocument: Boolean;
+    FHasHtmlDocument: boolean;
     FHtmlPrintedReceipt: string;
     FId: string;
-    FIsEmployee: Boolean;
-    FIsFavorite: Boolean;
-    FIsHtml: Boolean;
+    FIsEmployee: boolean;
+    FIsFavorite: boolean;
+    FIsHtml: boolean;
     FItemsLine: TItemsLineArray;
     FLanguageCode: string;
-    FLinesScannedCount: Integer;
+    FLinesScannedCount: integer;
     FPayments: TPaymentsArray;
     FPrintedReceiptState: string;
     FSequenceNumber: string;
@@ -35,24 +35,24 @@ type
     FTaxes: TTaxesArray;
     FTenderChange: TTenderChangeArray;
     FTotalAmount: string;
-    FTotalAmountNumeric: Double;
+    FTotalAmountNumeric: double;
     FTotalDiscount: string;
     FTotalTaxes: TTotalTaxes;
     FWorkstation: string;
   published
     property BarCode: string read FBarCode write FBarCode;
     property CouponsUsed: TCouponsUsedArray read FCouponsUsed;
-    property Currency: TCurrency read FCurrency;
+    property currency: TCurrency read FCurrency;
     property Date: TDateTime read FDate write FDate;
-    property HasHtmlDocument: Boolean read FHasHtmlDocument write FHasHtmlDocument;
+    property HasHtmlDocument: boolean read FHasHtmlDocument write FHasHtmlDocument;
     property HtmlPrintedReceipt: string read FHtmlPrintedReceipt write FHtmlPrintedReceipt;
     property Id: string read FId write FId;
-    property IsEmployee: Boolean read FIsEmployee write FIsEmployee;
-    property IsFavorite: Boolean read FIsFavorite write FIsFavorite;
-    property IsHtml: Boolean read FIsHtml write FIsHtml;
+    property IsEmployee: boolean read FIsEmployee write FIsEmployee;
+    property IsFavorite: boolean read FIsFavorite write FIsFavorite;
+    property IsHtml: boolean read FIsHtml write FIsHtml;
     property ItemsLine: TItemsLineArray read FItemsLine;
     property LanguageCode: string read FLanguageCode write FLanguageCode;
-    property LinesScannedCount: Integer read FLinesScannedCount write FLinesScannedCount;
+    property LinesScannedCount: integer read FLinesScannedCount write FLinesScannedCount;
     property Payments: TPaymentsArray read FPayments;
     property PrintedReceiptState: string read FPrintedReceiptState write FPrintedReceiptState;
     property SequenceNumber: string read FSequenceNumber write FSequenceNumber;
@@ -61,7 +61,7 @@ type
     property Taxes: TTaxesArray read FTaxes;
     property TenderChange: TTenderChangeArray read FTenderChange;
     property TotalAmount: string read FTotalAmount write FTotalAmount;
-    property TotalAmountNumeric: Double read FTotalAmountNumeric write FTotalAmountNumeric;
+    property TotalAmountNumeric: double read FTotalAmountNumeric write FTotalAmountNumeric;
     property TotalDiscount: string read FTotalDiscount write FTotalDiscount;
     property TotalTaxes: TTotalTaxes read FTotalTaxes;
     property Workstation: string read FWorkstation write FWorkstation;
@@ -74,4 +74,3 @@ implementation
 { TLidlTicket }
 
 end.
-

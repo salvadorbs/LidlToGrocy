@@ -15,56 +15,59 @@ type
 
   TGrocyService = class
   private
-    FHost: String;
-    FPort: String;
-    FApiKey: String;
+    FHost: string;
+    FPort: string;
+    FApiKey: string;
     FClient: TFPHTTPClient;
-    function GetBaseUrl: String;
-    function GetGrocyProductFromJson(const Response: string): TGrocyRoot;
-    function GetIdFromJsonGrocy(const Response: string; Field: string): Integer;
+    function GetBaseUrl: string;
+    function GetGrocyProductFromJson(const Response: string): TGrocyProduct;
+    function GetIdFromJsonGrocy(const Response: string; Field: string): integer;
   public
-    constructor Create(Host: String; Port: String; ApiKey: String);
+    constructor Create(Host: string; Port: string; ApiKey: string);
     destructor Destroy; override;
 
-    property BaseUrl: String read GetBaseUrl;
+    property BaseUrl: string read GetBaseUrl;
 
-    function CreateProduct(GrocyProduct: TGrocyProduct): Integer;
-    function AddBarcodeToProduct(GrocyBarcode: TGrocyBarcode): Integer;
-    function GetProductByBarcode(Barcode: String): TGrocyRoot;
-    function AddProductInStock(GrocyProductId: Integer;
-      ProductStock: TGrocyProductStock): Boolean;
+    function CreateProduct(GrocyProduct: TGrocyProduct): integer;
+    function AddBarcodeToProduct(GrocyBarcode: TGrocyBarcode): integer;
+    function GetProductByBarcode(Barcode: string): TGrocyProduct;
+    function AddProductInStock(GrocyProductId: integer; ProductStock: TGrocyProductStock): boolean;
   end;
 
 const
-  UrlProductByBarcode: String = 'stock/products/by-barcode/%s';
-  UrlCreateProduct: String = 'objects/products';
-  UrlAddBarcode: String = 'objects/product_barcodes';
-  UrlAddProductStock: String = 'stock/products/%d/add';
+  UrlProductByBarcode: string = 'stock/products/by-barcode/%s';
+  UrlCreateProduct: string = 'objects/products';
+  UrlAddBarcode: string = 'objects/product_barcodes';
+  UrlAddProductStock: string = 'stock/products/%d/add';
 
 implementation
 
 uses
   fpjson, jsonparser, mormot.net.client;
 
-{ TGrocyService }
+  { TGrocyService }
 
-function TGrocyService.GetBaseUrl: String;
+function TGrocyService.GetBaseUrl: string;
 begin
   Result := Format('http://%s:%s/api/', [FHost, FPort]);
 end;
 
-function TGrocyService.GetGrocyProductFromJson(const Response: string): TGrocyRoot;
+function TGrocyService.GetGrocyProductFromJson(const Response: string): TGrocyProduct;
+var
+  jData, jProduct: TJSONData;
 begin
-  Result := TGrocyRoot.Create();
+  Result := TGrocyProduct.Create();
   try
-    LoadJson(Result, Response, TypeInfo(TGrocyRoot));
+    jData := GetJSON(Response);
+    jProduct := jData.FindPath('product');
+    if Assigned(jProduct) then
+      LoadJson(Result, jProduct.AsJSON, TypeInfo(TGrocyProduct));
   finally
-
+    jData.Free;
   end;
 end;
 
-function TGrocyService.GetIdFromJsonGrocy(const Response: string; Field: string
-  ): Integer;
+function TGrocyService.GetIdFromJsonGrocy(const Response: string; Field: string): integer;
 var
   JData: TJSONData;
   JObject: TJSONObject;
@@ -78,7 +81,7 @@ begin
   end;
 end;
 
-constructor TGrocyService.Create(Host: String; Port: String; ApiKey: String);
+constructor TGrocyService.Create(Host: string; Port: string; ApiKey: string);
 begin
   FHost := Host;
   FPort := Port;
@@ -99,7 +102,7 @@ begin
   inherited Destroy;
 end;
 
-function TGrocyService.CreateProduct(GrocyProduct: TGrocyProduct): Integer;
+function TGrocyService.CreateProduct(GrocyProduct: TGrocyProduct): integer;
 var
   Response: string;
 begin
@@ -117,7 +120,7 @@ begin
   end;
 end;
 
-function TGrocyService.AddBarcodeToProduct(GrocyBarcode: TGrocyBarcode): Integer;
+function TGrocyService.AddBarcodeToProduct(GrocyBarcode: TGrocyBarcode): integer;
 var
   Response: string;
 begin
@@ -135,7 +138,7 @@ begin
   end;
 end;
 
-function TGrocyService.GetProductByBarcode(Barcode: String): TGrocyRoot;
+function TGrocyService.GetProductByBarcode(Barcode: string): TGrocyProduct;
 var
   Response: string;
 begin
@@ -144,18 +147,16 @@ begin
   try
     Response := FClient.Get(Format(Self.BaseURL + UrlProductByBarcode, [Barcode]));
   finally
-    if(FClient.ResponseStatusCode = 200) then
+    if (FClient.ResponseStatusCode = 200) then
       Result := GetGrocyProductFromJson(Response);
   end;
 end;
 
-function TGrocyService.AddProductInStock(GrocyProductId: Integer;
-  ProductStock: TGrocyProductStock): Boolean;
+function TGrocyService.AddProductInStock(GrocyProductId: integer; ProductStock: TGrocyProductStock): boolean;
 begin
   Result := False;
 
   try
-    FileFromString(ObjectToJson(ProductStock), 'testa.json');
     FClient.RequestBody := TRawByteStringStream.Create(ObjectToJson(ProductStock));
     FClient.Post(Format(Self.BaseURL + UrlAddProductStock, [GrocyProductId]));
   finally
@@ -167,4 +168,3 @@ begin
 end;
 
 end.
-

@@ -12,15 +12,15 @@ type
   { TConfiguration }
   TConfiguration = class
   private
-    FGrocyDefaultBestBeforeDays: Integer;
-    FGrocyDefaultBestBeforeDaysAfterThawing: Integer;
-    FGrocyDefaultConsumeLocation: Integer;
-    FGrocyLocationId: Integer;
-    FGrocyQuIdConsume: Integer;
-    FGrocyQuIdPrice: Integer;
-    FGrocyQuIdPurchase: Integer;
-    FGrocyQuIdStock: Integer;
-    FGrocyShoppingLocationId: Integer;
+    FGrocyDefaultBestBeforeDays: integer;
+    FGrocyDefaultBestBeforeDaysAfterThawing: integer;
+    FGrocyDefaultConsumeLocation: integer;
+    FGrocyLocationId: integer;
+    FGrocyQuIdConsume: integer;
+    FGrocyQuIdPrice: integer;
+    FGrocyQuIdPurchase: integer;
+    FGrocyQuIdStock: integer;
+    FGrocyShoppingLocationId: integer;
 
     procedure RestoreSettings(AJSONConfig: TJSONConfig);
     procedure SaveSettings(AJSONConfig: TJSONConfig);
@@ -28,15 +28,16 @@ type
     constructor Create; overload;
     destructor Destroy; override;
 
-    property GrocyLocationId: Integer read FGrocyLocationId write FGrocyLocationId;
-    property GrocyDefaultConsumeLocation: Integer read FGrocyDefaultConsumeLocation write FGrocyDefaultConsumeLocation;
-    property GrocyShoppingLocationId: Integer read FGrocyShoppingLocationId write FGrocyShoppingLocationId;
-    property GrocyDefaultBestBeforeDays: Integer read FGrocyDefaultBestBeforeDays write FGrocyDefaultBestBeforeDays;
-    property GrocyDefaultBestBeforeDaysAfterThawing: Integer read FGrocyDefaultBestBeforeDaysAfterThawing write FGrocyDefaultBestBeforeDaysAfterThawing;
-    property GrocyQuIdStock: Integer read FGrocyQuIdStock write FGrocyQuIdStock;
-    property GrocyQuIdPurchase: Integer read FGrocyQuIdPurchase write FGrocyQuIdPurchase;
-    property GrocyQuIdConsume: Integer read FGrocyQuIdConsume write FGrocyQuIdConsume;
-    property GrocyQuIdPrice: Integer read FGrocyQuIdPrice write FGrocyQuIdPrice;
+    property GrocyLocationId: integer read FGrocyLocationId write FGrocyLocationId;
+    property GrocyDefaultConsumeLocation: integer read FGrocyDefaultConsumeLocation write FGrocyDefaultConsumeLocation;
+    property GrocyShoppingLocationId: integer read FGrocyShoppingLocationId write FGrocyShoppingLocationId;
+    property GrocyDefaultBestBeforeDays: integer read FGrocyDefaultBestBeforeDays write FGrocyDefaultBestBeforeDays;
+    property GrocyDefaultBestBeforeDaysAfterThawing: integer
+      read FGrocyDefaultBestBeforeDaysAfterThawing write FGrocyDefaultBestBeforeDaysAfterThawing;
+    property GrocyQuIdStock: integer read FGrocyQuIdStock write FGrocyQuIdStock;
+    property GrocyQuIdPurchase: integer read FGrocyQuIdPurchase write FGrocyQuIdPurchase;
+    property GrocyQuIdConsume: integer read FGrocyQuIdConsume write FGrocyQuIdConsume;
+    property GrocyQuIdPrice: integer read FGrocyQuIdPrice write FGrocyQuIdPrice;
 
     procedure LoadConfig;
     procedure SaveConfig;
@@ -60,10 +61,13 @@ implementation
 procedure TConfiguration.RestoreSettings(AJSONConfig: TJSONConfig);
 begin
   GrocyLocationId := AJSONConfig.GetValue(CONFIG_GROCY_LOCATIONID, Self.GrocyLocationId);
-  GrocyDefaultConsumeLocation := AJSONConfig.GetValue(CONFIG_GROCY_DEFAULTCONSUMELOCATION, Self.GrocyDefaultConsumeLocation);
+  GrocyDefaultConsumeLocation := AJSONConfig.GetValue(CONFIG_GROCY_DEFAULTCONSUMELOCATION,
+    Self.GrocyDefaultConsumeLocation);
   GrocyShoppingLocationId := AJSONConfig.GetValue(CONFIG_GROCY_SHOPPINGLOCATIONID, Self.GrocyShoppingLocationId);
-  GrocyDefaultBestBeforeDays := AJSONConfig.GetValue(CONFIG_GROCY_DEFAULTBESTBEFOREDAYS, Self.GrocyDefaultBestBeforeDays);
-  GrocyDefaultBestBeforeDaysAfterThawing := AJSONConfig.GetValue(CONFIG_GROCY_DEFAULTBESTBEFOREDAYSAFTERTHAWING, Self.GrocyDefaultBestBeforeDaysAfterThawing);
+  GrocyDefaultBestBeforeDays := AJSONConfig.GetValue(CONFIG_GROCY_DEFAULTBESTBEFOREDAYS,
+    Self.GrocyDefaultBestBeforeDays);
+  GrocyDefaultBestBeforeDaysAfterThawing :=
+    AJSONConfig.GetValue(CONFIG_GROCY_DEFAULTBESTBEFOREDAYSAFTERTHAWING, Self.GrocyDefaultBestBeforeDaysAfterThawing);
   GrocyQuIdStock := AJSONConfig.GetValue(CONFIG_GROCY_QUIDSTOCK, Self.GrocyQuIdStock);
   GrocyQuIdPurchase := AJSONConfig.GetValue(CONFIG_GROCY_QUIDPURCHASE, Self.GrocyQuIdPurchase);
   GrocyQuIdConsume := AJSONConfig.GetValue(CONFIG_GROCY_QUIDCONSUME, Self.GrocyQuIdConsume);
@@ -134,4 +138,3 @@ begin
 end;
 
 end.
-

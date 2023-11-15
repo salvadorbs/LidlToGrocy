@@ -6,7 +6,11 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Classes, SysUtils, mormot.core.os, kernel.application, mormot.core.base,
+  Classes,
+  SysUtils,
+  mormot.core.os,
+  kernel.application,
+  mormot.core.base,
   mormot.core.unicode;
 
 var
@@ -15,15 +19,15 @@ var
 const
   VERSION = '0.1';
 
-function GetEx(const Name: array of RawUtf8; Description: RawUtf8; Default: RawUtf8 = ''): String;
-var
-  Arg: RawUtf8;
-begin
-  Executable.Command.Get(Name, Arg, Description, Default);
-  Result := Utf8DecodeToUnicodeString(Arg);
-end;
+  function GetEx(const Name: array of RawUtf8; Description: RawUtf8; Default: RawUtf8 = ''): string;
+  var
+    Arg: RawUtf8;
+  begin
+    Executable.Command.Get(Name, Arg, Description, Default);
+    Result := Utf8DecodeToUnicodeString(Arg);
+  end;
 
-{$R *.res}
+  {$R *.res}
 
 begin
   with Executable.Command do
@@ -35,7 +39,8 @@ begin
     Application.Verbose := Option(['v', 'verbose'], 'generate verbose output');
     Application.Help := Option(['?', 'help'], 'display this message');
     Application.NoStock := Option(['n', 'no-add-stock'], 'don''t add product in stock');
-    Application.NoOpenFoodFacts := Option(['c', 'no-call-openfoodfacts'], 'don''t get product infos from openfoodfacts');
+    Application.NoOpenFoodFacts :=
+      Option(['c', 'no-call-openfoodfacts'], 'don''t get product infos from openfoodfacts');
 
     Application.GrocyIp := GetEx(['i', 'grocy-ip'], 'grocy ip address');
     Application.GrocyPort := GetEx(['p', 'grocy-port'], 'grocy port', '9283');
@@ -45,7 +50,8 @@ begin
     Application.LidlLanguage := GetEx(['l', 'lidl-lang'], 'lidl language', 'en');
     Application.LidlToken := GetEx(['t', 'lidl-token'], 'lidl token');
 
-    Application.LidlJsonFilePath := GetEx(['f', 'lidl-filepath'], 'lidl json file (optional)');
+    Application.LidlJsonFilePath :=
+      GetEx(['f', 'lidl-filepath'], 'lidl json file (optional)');
 
     Application.Title := 'LidlToGrocy ' + VERSION;
 
@@ -56,4 +62,3 @@ begin
     Application.Free;
   end;
 end.
-
