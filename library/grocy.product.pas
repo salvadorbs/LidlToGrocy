@@ -83,6 +83,8 @@ type
     property TreatOpenedAsOutOfStock: string read FTreatOpenedAsOutOfStock write FTreatOpenedAsOutOfStock;
   end;
 
+  TGrocyProductArray = array of TGrocyProduct;
+
 implementation
 
 { TGrocyProduct }

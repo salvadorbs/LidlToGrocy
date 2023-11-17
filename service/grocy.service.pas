@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Grocy.Product, mormot.core.json, fphttpclient,
   opensslsockets, mormot.core.os, mormot.core.Text, mormot.core.base,
-  Grocy.Barcode, Grocy.ProductStock;
+  Grocy.Barcode, Grocy.ProductStock, OpenFoodFacts.ProductInfo, Kernel.Configuration;
 
 type
 
@@ -15,27 +15,33 @@ type
 
   TGrocyService = class
   private
+    FConfiguration: TConfiguration;
     FHost: string;
     FPort: string;
     FApiKey: string;
     FClient: TFPHTTPClient;
+    function CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
+    function CreateGrocyBarcode(const ProductId: integer; const Barcode: string): TGrocyBarcode;
+    procedure FreeRequestBody;
     function GetBaseUrl: string;
     function GetGrocyProductFromJson(const Response: string): TGrocyProduct;
     function GetIdFromJsonGrocy(const Response: string; Field: string): integer;
   public
-    constructor Create(Host: string; Port: string; ApiKey: string);
+    constructor Create(Host: string; Port: string; ApiKey: string; Configuration: TConfiguration);
     destructor Destroy; override;
 
     property BaseUrl: string read GetBaseUrl;
 
-    function CreateProduct(GrocyProduct: TGrocyProduct): integer;
-    function AddBarcodeToProduct(GrocyBarcode: TGrocyBarcode): integer;
+    function CreateProduct(OFFProductInfo: TOFFProductInfo): TGrocyProduct;
+    function AddBarcodeToProduct(const ProductId: integer; const Barcode: string): TGrocyBarcode;
     function GetProductByBarcode(Barcode: string): TGrocyProduct;
     function AddProductInStock(GrocyProductId: integer; ProductStock: TGrocyProductStock): boolean;
+    function GetProductByName(Name: string): TGrocyProduct;
   end;
 
 const
   UrlProductByBarcode: string = 'stock/products/by-barcode/%s';
+  UrlProductByName: string = 'objects/products?query[]=product.name=%s&limit=1';
   UrlCreateProduct: string = 'objects/products';
   UrlAddBarcode: string = 'objects/product_barcodes';
   UrlAddProductStock: string = 'stock/products/%d/add';
@@ -43,9 +49,61 @@ const
 implementation
 
 uses
-  fpjson, jsonparser, mormot.net.client;
+  fpjson, jsonparser, mormot.net.client, grocy.error, kernel.logger;
 
   { TGrocyService }
+
+function TGrocyService.CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
+var
+  GrocyProduct: TGrocyProduct;
+begin
+  Result := nil;
+
+  GrocyProduct := TGrocyProduct.Create();
+  try
+    GrocyProduct.DefaultSetup();
+
+    GrocyProduct.Name := OFFProductInfo.ProductName;
+    with FConfiguration do
+    begin
+      GrocyProduct.Name := OFFProductInfo.ProductName;
+      GrocyProduct.DefaultBestBeforeDays := IntToStr(GrocyDefaultBestBeforeDays);
+      GrocyProduct.DefaultBestBeforeDaysAfterThawing := IntToStr(GrocyDefaultBestBeforeDaysAfterThawing);
+      GrocyProduct.DefaultConsumeLocationId := IntToStr(GrocyDefaultConsumeLocation);
+      GrocyProduct.LocationId := IntToStr(GrocyLocationId);
+      GrocyProduct.QuIdConsume := IntToStr(GrocyQuIdConsume);
+      GrocyProduct.QuIdPrice := IntToStr(GrocyQuIdPrice);
+      GrocyProduct.QuIdPurchase := IntToStr(GrocyQuIdPurchase);
+      GrocyProduct.QuIdStock := IntToStr(GrocyQuIdStock);
+      GrocyProduct.ShoppingLocationId := IntToStr(GrocyShoppingLocationId);
+    end;
+  finally
+    Result := GrocyProduct;
+  end;
+end;
+
+function TGrocyService.CreateGrocyBarcode(const ProductId: integer; const Barcode: string): TGrocyBarcode;
+var
+  GrocyBarcode: TGrocyBarcode;
+begin
+  Result := nil;
+
+  GrocyBarcode := TGrocyBarcode.Create();
+  try
+    GrocyBarcode.DefaultSetup();
+    GrocyBarcode.Barcode := Barcode;
+    GrocyBarcode.ProductId := ProductId;
+    GrocyBarcode.ShoppingLocationId := FConfiguration.GrocyShoppingLocationId;
+  finally
+    Result := GrocyBarcode;
+  end;
+end;
+
+procedure TGrocyService.FreeRequestBody;
+begin
+  FClient.RequestBody.Free;
+  FClient.RequestBody := nil;
+end;
 
 function TGrocyService.GetBaseUrl: string;
 begin
@@ -81,11 +139,12 @@ begin
   end;
 end;
 
-constructor TGrocyService.Create(Host: string; Port: string; ApiKey: string);
+constructor TGrocyService.Create(Host: string; Port: string; ApiKey: string; Configuration: TConfiguration);
 begin
   FHost := Host;
   FPort := Port;
   FApiKey := ApiKey;
+  FConfiguration := Configuration;
 
   FClient := TFPHttpClient.Create(nil);
   FClient.AddHeader('User-Agent', 'Mozilla/5.0 (compatible; fpweb)');
@@ -102,39 +161,65 @@ begin
   inherited Destroy;
 end;
 
-function TGrocyService.CreateProduct(GrocyProduct: TGrocyProduct): integer;
+function TGrocyService.CreateProduct(OFFProductInfo: TOFFProductInfo): TGrocyProduct;
 var
   Response: string;
+  GrocyProduct: TGrocyProduct;
+  GrocyError: TGrocyError;
 begin
-  Result := -1;
+  Result := nil;
 
+  GrocyProduct := CreateGrocyProduct(OFFProductInfo);
   try
     FClient.RequestBody := TRawByteStringStream.Create(ObjectToJson(GrocyProduct));
     Response := FClient.Post(Self.BaseURL + UrlCreateProduct);
-  finally
     if (FClient.ResponseStatusCode = 200) then
-      Result := GetIdFromJsonGrocy(Response, 'created_object_id');
-
-    FClient.RequestBody.Free;
-    FClient.RequestBody := nil;
+    begin
+      GrocyProduct.Id := GetIdFromJsonGrocy(Response, 'created_object_id');
+      Result := GrocyProduct;
+    end
+    else if (FClient.ResponseStatusCode = 400) then
+    begin
+      GrocyError := TGrocyError.Create;
+      try
+        LoadJson(GrocyError, Response, TypeInfo(TGrocyError));
+        if GrocyError.isErrorIntegrityUnique() then
+        begin
+          TLogger.Info('Failed to add a new product in Grocy due to violation of the uniqueness of the product name %s',
+            [GrocyProduct.Name]);
+          FreeRequestBody;
+          Result := GetProductByName(GrocyProduct.Name);
+          GrocyProduct.Free;
+          GrocyProduct := nil;
+        end;
+      finally
+        GrocyError.Free;
+      end;
+    end;
+  finally
+    FreeRequestBody;
   end;
 end;
 
-function TGrocyService.AddBarcodeToProduct(GrocyBarcode: TGrocyBarcode): integer;
+function TGrocyService.AddBarcodeToProduct(const ProductId: integer; const Barcode: string): TGrocyBarcode;
 var
   Response: string;
+  GrocyBarcode: TGrocyBarcode;
 begin
-  Result := -1;
+  Result := nil;
 
+  GrocyBarcode := CreateGrocyBarcode(ProductId, Barcode);
   try
     FClient.RequestBody := TRawByteStringStream.Create(ObjectToJson(GrocyBarcode));
     Response := FClient.Post(Self.BaseURL + UrlAddBarcode);
   finally
     if (FClient.ResponseStatusCode = 200) then
-      Result := GetIdFromJsonGrocy(Response, 'created_object_id');
+    begin
+      GrocyBarcode.Id := GetIdFromJsonGrocy(Response, 'created_object_id');
+      Result := GrocyBarcode;
+    end;
 
-    FClient.RequestBody.Free;
-    FClient.RequestBody := nil;
+    FreeRequestBody;
   end;
 end;
 
@@ -162,8 +247,25 @@ begin
   finally
     Result := (FClient.ResponseStatusCode = 200);
 
-    FClient.RequestBody.Free;
-    FClient.RequestBody := nil;
+    FreeRequestBody;
+  end;
+end;
+
+function TGrocyService.GetProductByName(Name: string): TGrocyProduct;
+var
+  Response: string;
+  GrocyProducts: TGrocyProductArray;
+begin
+  Result := nil;
+  try
+    Response := FClient.Get(Format(Self.BaseURL + UrlProductByName, [EncodeURLElement(Name)]));
+  finally
+    if (FClient.ResponseStatusCode = 200) then
+    begin
+      DynArrayLoadJson(GrocyProducts, Response, TypeInfo(TGrocyProductArray));
+      if Length(GrocyProducts) = 1 then
+        Result := GrocyProducts[0];
+    end;
   end;
 end;
 

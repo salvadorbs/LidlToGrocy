@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, mormot.core.os, CustApp, Lidl.Ticket, Kernel.Configuration,
   OpenFoodFacts.ProductInfo, Lidl.ItemsLine, mormot.core.json, mormot.core.base,
-  Grocy.Service, Grocy.Barcode, Grocy.Product;
+  Grocy.Service, Grocy.Barcode, Grocy.Product, mormot.core.log;
 
 type
 
@@ -37,8 +37,6 @@ type
     procedure AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
       const LidlTicket: TLidlTicket);
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
-    function CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
-    function CreateGrocyBarcode(const ProductId: integer; const Barcode: string): TGrocyBarcode;
     procedure DoHelp(Sender: TObject);
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function GetLidlTickets: string;
@@ -76,7 +74,7 @@ const
 implementation
 
 uses
-  OpenFoodFacts.Service, Grocy.ProductStock, DateUtils;
+  OpenFoodFacts.Service, Grocy.ProductStock, DateUtils, Kernel.Logger;
 
   { TGrocyFastLidlAdder }
 
@@ -89,44 +87,18 @@ function TLidlToGrocy.GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
 var
   GrocyProduct: TGrocyProduct;
 begin
+  TLogger.Info('Find product in Grocy', []);
   GrocyProduct := nil;
   try
     GrocyProduct := FGrocyService.GetProductByBarcode(LidlProduct.CodeInput);
+    TLogger.Info('Found! ID = %d', [GrocyProduct.Id]);
   except
+    TLogger.Info('Not found!', []);
     //In case of product doesn't exists in Grocy
     GrocyProduct := AddNewGrocyProduct(LidlProduct);
   end;
 
   Result := GrocyProduct;
-end;
-
-function TLidlToGrocy.CreateGrocyProduct(const OFFProductInfo: TOFFProductInfo): TGrocyProduct;
-var
-  GrocyProduct: TGrocyProduct;
-begin
-  Result := nil;
-
-  GrocyProduct := TGrocyProduct.Create();
-  try
-    GrocyProduct.DefaultSetup();
-
-    GrocyProduct.Name := OFFProductInfo.ProductName;
-    with FConfiguration do
-    begin
-      Result.Name := OFFProductInfo.ProductName;
-      Result.DefaultBestBeforeDays := IntToStr(GrocyDefaultBestBeforeDays);
-      Result.DefaultBestBeforeDaysAfterThawing := IntToStr(GrocyDefaultBestBeforeDaysAfterThawing);
-      Result.DefaultConsumeLocationId := IntToStr(GrocyDefaultConsumeLocation);
-      Result.LocationId := IntToStr(GrocyLocationId);
-      Result.QuIdConsume := IntToStr(GrocyQuIdConsume);
-      Result.QuIdPrice := IntToStr(GrocyQuIdPrice);
-      Result.QuIdPurchase := IntToStr(GrocyQuIdPurchase);
-      Result.QuIdStock := IntToStr(GrocyQuIdStock);
-      Result.ShoppingLocationId := IntToStr(GrocyShoppingLocationId);
-    end;
-  finally
-    Result := GrocyProduct;
-  end;
 end;
 
 function TLidlToGrocy.AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
@@ -135,22 +107,26 @@ var
   OFFProductInfo: TOFFProductInfo;
   GrocyProduct: TGrocyProduct;
 begin
-  OFFProductInfo := GetOFFProductInfo(LidlProduct);
+  TLogger.InfoEnter('Create a new product with barcode %s', [LidlProduct.CodeInput]);
+  TLogger.Info('Call OpenFoodFacts to get some informations', []);
+
   GrocyProduct := nil;
   GrocyBarcode := nil;
 
+  OFFProductInfo := GetOFFProductInfo(LidlProduct);
   try
-    GrocyProduct := CreateGrocyProduct(OFFProductInfo);
-    GrocyProduct.Id := FGrocyService.CreateProduct(GrocyProduct);
-
-    GrocyBarcode := CreateGrocyBarcode(GrocyProduct.Id, LidlProduct.CodeInput);
-    FGrocyService.AddBarcodeToProduct(GrocyBarcode);
+    TLogger.Info('Insert product %s in Grocy', [OFFProductInfo.ProductName]);
+    GrocyProduct := FGrocyService.CreateProduct(OFFProductInfo);
+    if Assigned(GrocyProduct) then
+      GrocyBarcode := FGrocyService.AddBarcodeToProduct(GrocyProduct.Id, LidlProduct.CodeInput);
   finally
     OFFProductInfo.Free;
     GrocyBarcode.Free;
   end;
 
   Result := GrocyProduct;
+  if Assigned(GrocyProduct) then
+    TLogger.InfoExit('Product inserted in Grocy. ID = %d', [GrocyProduct.Id]);
 end;
 
 procedure TLidlToGrocy.AddGrocyProductInStock(const LidlProduct: TItemsLine;
@@ -168,25 +144,6 @@ begin
     finally
       GrocyProductStock.Free;
     end;
-  end;
-end;
-
-function TLidlToGrocy.CreateGrocyBarcode(const ProductId: integer; const Barcode: string): TGrocyBarcode;
-var
-  GrocyBarcode: TGrocyBarcode;
-begin
-  Result := nil;
-
-  GrocyBarcode := TGrocyBarcode.Create();
-  try
-    GrocyBarcode.Amount := '1';
-    GrocyBarcode.Barcode := Barcode;
-    GrocyBarcode.ProductId := ProductId;
-    GrocyBarcode.ShoppingLocationId := FConfiguration.GrocyShoppingLocationId;
-    GrocyBarcode.QuId := '1';
-    GrocyBarcode.Note := 'Automatically created by LidlToGrocy';
-  finally
-    Result := GrocyBarcode;
   end;
 end;
 
@@ -242,16 +199,25 @@ var
   LidlProduct: TItemsLine;
 begin
   if (FLidlJsonFilePath <> '') and FileExists(FLidlJsonFilePath) then
-    FLidlJson := StringFromFile(FLidlJsonFilePath)
-  else
-    FLidlJson := GetLidlTickets();
+  begin
+    TLogger.Info('Loading json from file %s', [FLidlJsonFilePath]);
+    FLidlJson := StringFromFile(FLidlJsonFilePath);
+  end
+  else begin
+    TLogger.Info('Get Json from LidlPlus web site', []);
+    FLidlJson := GetLidlTickets
+  end;
+
+  TLogger.Debug('Loading JSON', []);
 
   DynArrayLoadJson(FLidlTickets, FLidlJson, TypeInfo(TLidlTicketArray));
 
   for LidlTicket in FLidlTickets do
   begin
+    TLogger.InfoEnter('Started processing LIDL receipt (barcode %s)', [LidlTicket.BarCode]);
     for LidlProduct in LidlTicket.ItemsLine do
     begin
+      TLogger.InfoEnter('Started processing item (barcode %s)', [LidlProduct.CodeInput]);
       GrocyProduct := nil;
       try
         GrocyProduct := GetGrocyProduct(LidlProduct);
@@ -262,21 +228,12 @@ begin
         if Assigned(GrocyProduct) then
           GrocyProduct.Free;
       end;
-    end;
-  end;
-  //boolOpts := Length(Executable.Command.Options) > 0;
-  //if boolOpts then
-  //begin
-  //  if FHelp then
-  //    FOnHelp(Self)
-  //  else
-  //    TOpenFoodFactsService.GetProduct('3017620422003');
+      TLogger.InfoExit('Completed processing', []);
 
-  //  Executable.Command.ConsoleWriteUnknown();
-  //end
-  //else
-  //  ConsoleWrite(Executable.Command.FullDescription());
-  //end;
+      Sleep(30000);
+    end;
+    TLogger.InfoExit('Completed processing', []);
+  end;
 
   Terminate;
 end;
@@ -314,7 +271,7 @@ end;
 
 procedure TLidlToGrocy.SetupGrocy;
 begin
-  FGrocyService := TGrocyService.Create(FGrocyIp, FGrocyPort, FGrocyApiKey);
+  FGrocyService := TGrocyService.Create(FGrocyIp, FGrocyPort, FGrocyApiKey, FConfiguration);
 end;
 
 end.

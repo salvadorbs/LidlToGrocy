@@ -15,13 +15,17 @@ type
   private
     FAmount: string;
     FBarcode: string;
+    FId: Integer;
     FNote: string;
     FProductId: integer;
     FQuId: string;
     FShoppingLocationId: integer;
+  public
+    procedure DefaultSetup();
   published
     property Amount: string read FAmount write FAmount;
     property Barcode: string read FBarcode write FBarcode;
+    property Id: Integer read FId write FId default -1;
     property Note: string read FNote write FNote;
     property ProductId: integer read FProductId write FProductId;
     property QuId: string read FQuId write FQuId;
@@ -30,9 +34,19 @@ type
 
 implementation
 
+{ TGrocyBarcode }
+
+procedure TGrocyBarcode.DefaultSetup();
+begin
+  FAmount := '1';
+  FId := -1;
+  FQuId := '1';
+  FNote := 'Automatically created by LidlToGrocy';
+end;
+
 initialization
   Rtti.ByTypeInfo[TypeInfo(TGrocyBarcode)].Props.NameChanges(
-    ['Amount', 'Barcode', 'Note', 'ProductId', 'QuId', 'ShoppingLocationId'],
-    ['amount', 'barcode', 'note', 'product_id', 'qu_id', 'shopping_location_id']);
+    ['Amount', 'Barcode', 'Id', 'Note', 'ProductId', 'QuId', 'ShoppingLocationId'],
+    ['amount', 'barcode', 'id', 'note', 'product_id', 'qu_id', 'shopping_location_id']);
 
 end.

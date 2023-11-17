@@ -63,6 +63,9 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="LCLBase"/>
+      </Item>
+      <Item>
         <PackageName Value="mormot2"/>
       </Item>
     </RequiredPackages>
@@ -150,6 +153,16 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Grocy.ProductStock"/>
       </Unit>
+      <Unit>
+        <Filename Value="library\kernel.logger.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Kernel.Logger"/>
+      </Unit>
+      <Unit>
+        <Filename Value="library\grocy.error.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Grocy.Error"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -196,15 +209,6 @@
   </CompilerOptions>
   <Debugging>
     <Exceptions>
-      <Item>
-        <Name Value="EAbort"/>
-      </Item>
-      <Item>
-        <Name Value="ECodetoolError"/>
-      </Item>
-      <Item>
-        <Name Value="EFOpenError"/>
-      </Item>
       <Item>
         <Name Value="EHTTPClient"/>
       </Item>
