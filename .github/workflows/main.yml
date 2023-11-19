@@ -1,0 +1,137 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build push events (debug mode)
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the develop branch
+on:
+  pull_request:
+  push:
+    paths-ignore:
+    - "README.md"
+    branches:
+      - master
+      - develop
+      - releases/*
+  workflow_dispatch:
+        
+env:
+  FPC_URL: 'gitlab'
+  FPC_BRANCH: 'release_3_2_2'
+  LAZ_URL: 'gitlab'
+  LAZ_BRANCH: 'lazarus_3_0_RC2'
+  LAZ_REVISION_2_4: ''
+  LAZ_DIR: 'fpcLaz'
+  BUILD_MODE: 'Debug'   
+  FPCUP_OPT: ''
+  LAZ_PATCH: '' 
+  DIR_SOURCE: 'lidltogrocy_src'
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    
+    runs-on: ${{ matrix.config.os }}
+    
+    defaults:
+      run:
+        shell: bash 
+        
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+
+          - os: windows-latest
+            name: 'Windows 64'
+            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-win64.exe'
+            lazbuild: 'fpcLaz/lazarus/lazbuild.exe'
+            dbg2mab: 'dbg2mab.exe'
+            build-widgetset: 'win32'
+            build-os: 'win64'
+            debug_file: 'lidltogrocy.dbg'
+
+          - os: ubuntu-22.04
+            name: 'Linux 64 GTK2'
+            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
+            lazbuild: 'fpcLaz/lazarus/lazbuild'
+            dbg2mab: 'dbg2mab'
+            build-widgetset: 'gtk2'
+            build-os: 'linux'
+            debug_file: 'lidltogrocy.dbg'
+
+          - os: ubuntu-22.04
+            name: 'Linux 64 GTK3'
+            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
+            lazbuild: 'fpcLaz/lazarus/lazbuild'
+            dbg2mab: 'dbg2mab'
+            build-widgetset: 'gtk3'
+            build-os: 'linux'
+            debug_file: 'lidltogrocy.dbg'
+          
+          - os: ubuntu-20.04
+            name: 'Linux 64 QT5'
+            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
+            lazbuild: 'fpcLaz/lazarus/lazbuild'
+            dbg2mab: 'dbg2mab'
+            build-widgetset: 'qt5'
+            build-os: 'linux'
+            debug_file: 'lidltogrocy.dbg'
+          
+          - os: ubuntu-22.04
+            name: 'Linux 64 QT6'
+            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
+            lazbuild: 'fpcLaz/lazarus/lazbuild'
+            dbg2mab: 'dbg2mab'
+            build-widgetset: 'qt6'
+            build-os: 'linux'
+            debug_file: 'lidltogrocy.dbg'
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+        path: '${{ env.DIR_SOURCE }}'
+
+    - name: Generate Cache Hash
+      run: echo "${{ matrix.config.fpcup-url }}${{ env.FPCUP_OPT }}${{ env.FPC_URL }}${{ env.FPC_BRANCH }}${{ env.LAZ_URL }}${{ env.LAZ_BRANCH }}${{ env.LAZ_REVISION_2_4 }}${{ env.LAZ_PATCH}}${{ matrix.config.name }}" > .cache
+
+    - name: Cache
+      id: cache
+      uses: actions/cache@v3.0.11
+      env:
+        cache-name: cache-laz-v0.1
+      with:
+        path: |
+          ${{ env.LAZ_DIR }}
+          ${{ env.DIR_SOURCE }}/3p/mORMot2/static
+        key: ${{ runner.os }}-${{ env.cache-name }}_${{ matrix.config.build-widgetset }}-${{ hashFiles('.cache') }}     
+
+    - name: Install Lazarus
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        curl --retry 5 -L -o fpcup ${{ matrix.config.fpcup-url }}
+        chmod +x fpcup
+        mkdir ${{ env.LAZ_DIR }}
+        ./fpcup --installdir=${{ env.LAZ_DIR }} --fpcURL=${{ env.FPC_URL }} --fpcBranch=${{ env.FPC_BRANCH }} --lazURL=${{ env.LAZ_URL }} --lazBranch=${{ env.LAZ_BRANCH }} --lazPATCH="${{ env.DIR_SOURCE}}${{ env.LAZ_PATCH}}" ${{ env.FPCUP_OPT }} --only=docker --noconfirm --verbose
+   
+    - name: Install Lazarus Packages
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: ${{ env.DIR_SOURCE }}/utils/installPackages.ps1 -Source:"${{ env.DIR_SOURCE }}" -LazBuildPath:"${{ matrix.config.lazbuild }}" -BuildIde:$false
+
+    - name: Validate Cache
+      if: steps.cache.outputs.cache-hit == 'true'
+      run: ${{ matrix.config.lazbuild }} --version && echo "success=true" >> $GITHUB_OUTPUT || echo "success=false" >> $GITHUB_OUTPUT
+
+    - name: Build LidlToGrocy (${{ env.BUILD_MODE }})
+      run: ${{ matrix.config.lazbuild }} "${{ env.DIR_SOURCE }}/LidlToGrocy.lpi" --no-write-project --build-mode="${{ env.BUILD_MODE }}" --widgetset=${{ matrix.config.build-widgetset }}
+
+    - name: Upload the Build Artifact
+      uses: actions/upload-artifact@v3.1.1
+      with:
+        name: LidlToGrocy ${{ env.BUILD_MODE }} build - ${{ matrix.config.build-widgetset }}
+        path: |
+          ${{ env.DIR_SOURCE}}/bin
