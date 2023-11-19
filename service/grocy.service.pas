@@ -37,6 +37,7 @@ type
     function GetProductByBarcode(Barcode: string): TGrocyProduct;
     function AddProductInStock(GrocyProductId: integer; ProductStock: TGrocyProductStock): boolean;
     function GetProductByName(Name: string): TGrocyProduct;
+    function ConsumeByBarcode(Barcode: string; Amount: Integer): boolean;
   end;
 
 const
@@ -45,6 +46,7 @@ const
   UrlCreateProduct: string = 'objects/products';
   UrlAddBarcode: string = 'objects/product_barcodes';
   UrlAddProductStock: string = 'stock/products/%d/add';
+  UrlConsumeByBarcode: string = 'stock/products/by-barcode/%s/consume';
 
 implementation
 
@@ -266,6 +268,26 @@ begin
       if Length(GrocyProducts) = 1 then
         Result := GrocyProducts[0];
     end;
+  end;
+end;
+
+function TGrocyService.ConsumeByBarcode(Barcode: string; Amount: Integer): boolean;
+var
+  jObject : TJSONObject;
+begin
+  Result := false;
+  jObject := TJSONObject.Create;
+  jObject.Add('amount', Amount);
+  jObject.Add('transaction_type', 'consume');
+  jObject.Add('spoiled', false);
+
+  try
+    FClient.RequestBody := TRawByteStringStream.Create(jObject.AsJSON);
+    FClient.Post(Format(Self.BaseURL + UrlConsumeByBarcode, [Barcode]));
+  finally
+    Result := (FClient.ResponseStatusCode = 200);
+    FreeRequestBody;
+    jObject.Free;
   end;
 end;
 

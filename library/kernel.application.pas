@@ -17,6 +17,7 @@ type
 
   TLidlToGrocy = class(TCustomApplication)
   private
+    FConsumeNow: boolean;
     FGrocyApiKey: string;
     FGrocyIp: string;
     FGrocyPort: string;
@@ -28,6 +29,7 @@ type
     FNoOpenFoodFacts: boolean;
     FNoStock: boolean;
     FOnHelp: TNotifyEvent;
+    FSaveLidlJson: boolean;
     FVerbose: boolean;
     FLidlJson: RawUTf8;
     FLidlTickets: TLidlTicketArray;
@@ -37,6 +39,7 @@ type
     procedure AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
       const LidlTicket: TLidlTicket);
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
+    procedure ConsumeProduct(LidlProduct: TItemsLine);
     procedure DoHelp(Sender: TObject);
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function GetLidlTickets: string;
@@ -51,8 +54,10 @@ type
 
     property Verbose: boolean read FVerbose write FVerbose;
     property Help: boolean read FHelp write FHelp;
+    property ConsumeNow: boolean read FConsumeNow write FConsumeNow;
     property NoStock: boolean read FNoStock write FNoStock;
     property NoOpenFoodFacts: boolean read FNoOpenFoodFacts write FNoOpenFoodFacts;
+    property SaveLidlJson: boolean read FSaveLidlJson write FSaveLidlJson;
 
     property GrocyIp: string read FGrocyIp write FGrocyIp;
     property GrocyPort: string read FGrocyPort write FGrocyPort;
@@ -129,6 +134,12 @@ begin
     TLogger.InfoExit('Product inserted in Grocy. ID = %d', [GrocyProduct.Id]);
 end;
 
+procedure TLidlToGrocy.ConsumeProduct(LidlProduct: TItemsLine);
+begin
+  if (FConsumeNoW) then
+    FGrocyService.ConsumeByBarcode(LidlProduct.CodeInput, StrToInt(LidlProduct.Quantity));
+end;
+
 procedure TLidlToGrocy.AddGrocyProductInStock(const LidlProduct: TItemsLine;
   const GrocyProduct: TGrocyProduct; const LidlTicket: TLidlTicket);
 var
@@ -159,6 +170,8 @@ begin
     begin
       //TODO throw error and terminate
       Result := output;
+      if SaveLidlJson then
+        FileFromString(output, 'lidl.json');
     end;
   end
   else
@@ -223,16 +236,19 @@ begin
         GrocyProduct := GetGrocyProduct(LidlProduct);
 
         if Assigned(GrocyProduct) then
+        begin
           AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket);
+          ConsumeProduct(LidlProduct);
+        end;
       finally
         if Assigned(GrocyProduct) then
           GrocyProduct.Free;
       end;
       TLogger.InfoExit('Completed processing', []);
-
-      Sleep(30000);
     end;
     TLogger.InfoExit('Completed processing', []);
+
+    Sleep(30000);
   end;
 
   Terminate;
