@@ -39,7 +39,7 @@ type
     procedure AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
       const LidlTicket: TLidlTicket);
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
-    procedure ConsumeProduct(LidlProduct: TItemsLine);
+    procedure ConsumeGrocyProduct(LidlProduct: TItemsLine);
     procedure DoHelp(Sender: TObject);
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function GetLidlTickets: string;
@@ -96,7 +96,7 @@ begin
   GrocyProduct := nil;
   try
     GrocyProduct := FGrocyService.GetProductByBarcode(LidlProduct.CodeInput);
-    TLogger.Info('Found! ID = %d', [GrocyProduct.Id]);
+    TLogger.Info('Found! Grocy Product ID = %d', [GrocyProduct.Id]);
   except
     TLogger.Info('Not found!', []);
     //In case of product doesn't exists in Grocy
@@ -134,10 +134,13 @@ begin
     TLogger.InfoExit('Product inserted in Grocy. ID = %d', [GrocyProduct.Id]);
 end;
 
-procedure TLidlToGrocy.ConsumeProduct(LidlProduct: TItemsLine);
+procedure TLidlToGrocy.ConsumeGrocyProduct(LidlProduct: TItemsLine);
 begin
   if (FConsumeNoW) then
+  begin
+    TLogger.Info('Consume product now', [LidlProduct.Quantity]);
     FGrocyService.ConsumeByBarcode(LidlProduct.CodeInput, StrToInt(LidlProduct.Quantity));
+  end;
 end;
 
 procedure TLidlToGrocy.AddGrocyProductInStock(const LidlProduct: TItemsLine;
@@ -147,11 +150,13 @@ var
 begin
   if not (FNoStock) then
   begin
+    TLogger.Info('Adding quantity (%s) in Grocy', [LidlProduct.Quantity]);
     GrocyProductStock := TGrocyProductStock.Create(LidlProduct.Quantity,
       IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays), LidlProduct.CurrentUnitPrice,
       'purchase', LidlTicket.Date);
     try
-      FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock);
+      if not FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock) then
+        TLogger.Error('Error adding quantity to product in Grocy', []);
     finally
       GrocyProductStock.Free;
     end;
@@ -165,18 +170,14 @@ begin
   Result := '';
   if (FLidlToken <> '') then
   begin
+    TLogger.Info('Run python script lidl-plus with parameters [%s, %s, %s]', [FLidlLanguage, FLidlCountry, FLidlToken]);
     output := RunRedirect(Format(LIDL_PLUS_COMMANDLINE, [FLidlLanguage, FLidlCountry, FLidlToken]));
     if output <> '' then
     begin
-      //TODO throw error and terminate
       Result := output;
       if SaveLidlJson then
         FileFromString(output, 'lidl.json');
     end;
-  end
-  else
-  begin
-    //TODO throw error and terminate
   end;
 end;
 
@@ -212,6 +213,15 @@ var
   LidlProduct: TItemsLine;
   value: Double;
 begin
+  if ((FGrocyApiKey = '') or (FLidlToken = '') or (FGrocyApiKey = '')) then
+  begin
+    ConsoleWrite(Executable.Command.FullDescription);
+    Terminate;
+
+    Exit;
+  end;
+
+
   if (FLidlJsonFilePath <> '') and FileExists(FLidlJsonFilePath) then
   begin
     TLogger.Info('Loading json from file %s', [FLidlJsonFilePath]);
@@ -219,12 +229,15 @@ begin
   end
   else begin
     TLogger.Info('Get Json from LidlPlus web site', []);
-    FLidlJson := GetLidlTickets
+    FLidlJson := GetLidlTickets();
   end;
 
   TLogger.Debug('Loading JSON', []);
 
   DynArrayLoadJson(FLidlTickets, FLidlJson, TypeInfo(TLidlTicketArray));
+
+  if (Length(FLidlTickets) = 0) then
+    TLogger.Error('Invalid lidl json file', []);
 
   for LidlTicket in FLidlTickets do
   begin
@@ -242,7 +255,7 @@ begin
         if Assigned(GrocyProduct) then
         begin
           AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket);
-          ConsumeProduct(LidlProduct);
+          ConsumeGrocyProduct(LidlProduct);
         end;
       finally
         if Assigned(GrocyProduct) then

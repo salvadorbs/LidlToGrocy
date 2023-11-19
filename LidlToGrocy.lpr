@@ -30,9 +30,14 @@ const
   {$R *.res}
 
 begin
+  {$if declared(UseHeapTrace)}
+  GlobalSkipIfNoLeaks := True;
+  SetHeapTraceOutput('trace.log');
+  {$endIf}
+
   with Executable.Command do
   begin
-    ExeDescription := 'An executable to add easily your Lidl receipts into Grocy' + '[!!!UNSTABLE!!!]';
+    ExeDescription := 'An executable to add easily your Lidl receipts into Grocy ' + VERSION + ' [!!!UNSTABLE!!!]';
 
     Application := TLidlToGrocy.Create(nil);
 
@@ -41,8 +46,8 @@ begin
     Application.NoStock := Option(['n', 'no-add-stock'], 'don''t add product in stock');
     Application.NoOpenFoodFacts :=
       Option(['c', 'no-call-openfoodfacts'], 'don''t get product infos from openfoodfacts');
-    Application.SaveLidlJson := Option(['s', 'save-lidl-json'], 'save lidl json in a file');
-    Application.ConsumeNow := Option(['o', 'save-lidl-json'], 'save lidl json in a file');
+    Application.SaveLidlJson := Option(['s', 'save-lidl-json'], 'save lidl json in a file (lidl.json)');
+    Application.ConsumeNow := Option(['o', 'consume-now'], 'consume grocy product after adding');
 
     Application.GrocyIp := GetEx(['i', 'grocy-ip'], 'grocy ip address');
     Application.GrocyPort := GetEx(['p', 'grocy-port'], 'grocy port', '9283');

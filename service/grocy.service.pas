@@ -187,10 +187,16 @@ begin
         LoadJson(GrocyError, Response, TypeInfo(TGrocyError));
         if GrocyError.isErrorIntegrityUnique() then
         begin
-          TLogger.Info('Failed to add a new product in Grocy due to violation of the uniqueness of the product name %s',
+          TLogger.Error('Failed to add a new product in Grocy due to violation of the uniqueness of the product name %s',
             [GrocyProduct.Name]);
           FreeRequestBody;
+
+          TLogger.Info('Finding Grocy product with same name "%s"', [GrocyProduct.Name]);
           Result := GetProductByName(GrocyProduct.Name);
+          if Assigned(Result) then
+            TLogger.Info('Found! Grocy Product ID = %d', [Result.Id]);
+
+          // Now GrocyProduct doesn't need anymore
           GrocyProduct.Free;
           GrocyProduct := nil;
         end;
