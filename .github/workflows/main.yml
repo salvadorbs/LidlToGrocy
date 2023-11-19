@@ -10,7 +10,7 @@ on:
     paths-ignore:
     - "README.md"
     branches:
-      - master
+      - main
       - develop
       - releases/*
   workflow_dispatch:
@@ -52,38 +52,10 @@ jobs:
             debug_file: 'lidltogrocy.dbg'
 
           - os: ubuntu-22.04
-            name: 'Linux 64 GTK2'
+            name: 'Linux 64'
             fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
             lazbuild: 'fpcLaz/lazarus/lazbuild'
             dbg2mab: 'dbg2mab'
-            build-widgetset: 'gtk2'
-            build-os: 'linux'
-            debug_file: 'lidltogrocy.dbg'
-
-          - os: ubuntu-22.04
-            name: 'Linux 64 GTK3'
-            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
-            lazbuild: 'fpcLaz/lazarus/lazbuild'
-            dbg2mab: 'dbg2mab'
-            build-widgetset: 'gtk3'
-            build-os: 'linux'
-            debug_file: 'lidltogrocy.dbg'
-          
-          - os: ubuntu-20.04
-            name: 'Linux 64 QT5'
-            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
-            lazbuild: 'fpcLaz/lazarus/lazbuild'
-            dbg2mab: 'dbg2mab'
-            build-widgetset: 'qt5'
-            build-os: 'linux'
-            debug_file: 'lidltogrocy.dbg'
-          
-          - os: ubuntu-22.04
-            name: 'Linux 64 QT6'
-            fpcup-url: 'https://github.com/LongDirtyAnimAlf/Reiniero-fpcup/releases/download/v2.2.0s/fpclazup-x86_64-linux'
-            lazbuild: 'fpcLaz/lazarus/lazbuild'
-            dbg2mab: 'dbg2mab'
-            build-widgetset: 'qt6'
             build-os: 'linux'
             debug_file: 'lidltogrocy.dbg'
 
