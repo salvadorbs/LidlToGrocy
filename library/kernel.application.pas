@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, mormot.core.os, CustApp, Lidl.Ticket, Kernel.Configuration,
   OpenFoodFacts.ProductInfo, Lidl.ItemsLine, mormot.core.json, mormot.core.base,
-  Grocy.Service, Grocy.Barcode, Grocy.Product, mormot.core.log;
+  Grocy.Service, Grocy.Barcode, Grocy.Product, mormot.core.log, Math;
 
 type
 
@@ -210,6 +210,7 @@ var
   LidlTicket: TLidlTicket;
   GrocyProduct: TGrocyProduct;
   LidlProduct: TItemsLine;
+  value: Double;
 begin
   if (FLidlJsonFilePath <> '') and FileExists(FLidlJsonFilePath) then
   begin
@@ -233,6 +234,9 @@ begin
       TLogger.InfoEnter('Started processing item (barcode %s)', [LidlProduct.CodeInput]);
       GrocyProduct := nil;
       try
+        if TryStrToFloat(LidlProduct.Quantity, value) and (frac(value) <> 0) then
+          LidlProduct.Quantity := IntToStr(Ceil(value));
+
         GrocyProduct := GetGrocyProduct(LidlProduct);
 
         if Assigned(GrocyProduct) then
