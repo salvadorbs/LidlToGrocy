@@ -241,6 +241,12 @@ begin
 
   for LidlTicket in FLidlTickets do
   begin
+    if (FConfiguration.LidlTickets.IndexOf(LidlTicket.BarCode) <> -1) then
+    begin
+      TLogger.Info('LIDL receipt already inserted in Grocy (barcode %s). I move on to the next one', [LidlTicket.BarCode]);
+      continue;
+    end;
+
     TLogger.InfoEnter('Started processing LIDL receipt (barcode %s)', [LidlTicket.BarCode]);
     for LidlProduct in LidlTicket.ItemsLine do
     begin
@@ -263,6 +269,9 @@ begin
       end;
       TLogger.InfoExit('Completed processing', []);
     end;
+
+    FConfiguration.LidlTickets.Add(LidlTicket.BarCode);
+
     TLogger.InfoExit('Completed processing', []);
 
     Sleep(30000);
@@ -289,6 +298,8 @@ destructor TLidlToGrocy.Destroy;
 var
   I: integer;
 begin
+  FConfiguration.SaveConfig;
+
   if Assigned(FLidlTickets) then
   begin
     for I := 0 to length(FLidlTickets) - 1 do

@@ -21,6 +21,7 @@ type
     FGrocyQuIdPurchase: integer;
     FGrocyQuIdStock: integer;
     FGrocyShoppingLocationId: integer;
+    FLidlTickets: TStringList;
 
     procedure RestoreSettings(AJSONConfig: TJSONConfig);
     procedure SaveSettings(AJSONConfig: TJSONConfig);
@@ -38,6 +39,7 @@ type
     property GrocyQuIdPurchase: integer read FGrocyQuIdPurchase write FGrocyQuIdPurchase;
     property GrocyQuIdConsume: integer read FGrocyQuIdConsume write FGrocyQuIdConsume;
     property GrocyQuIdPrice: integer read FGrocyQuIdPrice write FGrocyQuIdPrice;
+    property LidlTickets: TStringList read FLidlTickets write FLidlTickets;
 
     procedure LoadConfig;
     procedure SaveConfig;
@@ -53,6 +55,7 @@ const
   CONFIG_GROCY_QUIDPURCHASE = 'grocy/qu_id_purchase';
   CONFIG_GROCY_QUIDCONSUME = 'grocy/qu_id_consume';
   CONFIG_GROCY_QUIDPRICE = 'grocy/qu_id_price';
+  CONFIG_LIDL_TICKETS = 'lidl/tickets';
 
 implementation
 
@@ -72,6 +75,7 @@ begin
   GrocyQuIdPurchase := AJSONConfig.GetValue(CONFIG_GROCY_QUIDPURCHASE, Self.GrocyQuIdPurchase);
   GrocyQuIdConsume := AJSONConfig.GetValue(CONFIG_GROCY_QUIDCONSUME, Self.GrocyQuIdConsume);
   GrocyQuIdPrice := AJSONConfig.GetValue(CONFIG_GROCY_QUIDPRICE, Self.GrocyQuIdPrice);
+  AJSONConfig.GetValue(CONFIG_LIDL_TICKETS, Self.LidlTickets, '');
 end;
 
 procedure TConfiguration.SaveSettings(AJSONConfig: TJSONConfig);
@@ -85,6 +89,7 @@ begin
   AJSONConfig.SetValue(CONFIG_GROCY_QUIDPURCHASE, Self.GrocyQuIdPurchase);
   AJSONConfig.SetValue(CONFIG_GROCY_QUIDCONSUME, Self.GrocyQuIdConsume);
   AJSONConfig.SetValue(CONFIG_GROCY_QUIDPRICE, Self.GrocyQuIdPrice);
+  AJSONConfig.SetValue(CONFIG_LIDL_TICKETS, Self.LidlTickets);
 end;
 
 constructor TConfiguration.Create;
@@ -98,10 +103,14 @@ begin
   FGrocyQuIdPurchase := 3;
   FGrocyQuIdConsume := 2;
   FGrocyQuIdPrice := 3;
+
+  FLidlTickets := TStringList.Create;
 end;
 
 destructor TConfiguration.Destroy;
 begin
+  FLidlTickets.Free;
+
   inherited Destroy;
 end;
 
@@ -113,7 +122,7 @@ begin
   try
     JSONConfig.Formatted := True;
     JSONConfig.FormatIndentsize := 4;
-    JSONConfig.Filename := IncludeLeadingPathDelimiter(GetCurrentDir) + 'settings.json';
+    JSONConfig.Filename := IncludeTrailingPathDelimiter(GetCurrentDir) + 'settings.json';
 
     RestoreSettings(JSONConfig);
   finally
@@ -130,7 +139,7 @@ begin
     JSONConfig.Formatted := True;
     JSONConfig.FormatIndentsize := 4;
 
-    JSONConfig.Filename := IncludeLeadingPathDelimiter(GetCurrentDir) + 'settings.json';
+    JSONConfig.Filename := IncludeTrailingPathDelimiter(GetCurrentDir) + 'settings.json';
     SaveSettings(JSONConfig);
   finally
     JSONConfig.Free;
