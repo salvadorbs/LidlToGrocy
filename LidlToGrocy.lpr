@@ -55,7 +55,7 @@ begin
 
     Application.LidlCountry := GetEx(['c', 'lidl-country'], 'lidl country' , 'EN');
     Application.LidlLanguage := GetEx(['l', 'lidl-lang'], 'lidl language', 'en');
-    Application.LidlToken := GetEx(['t', 'lidl-token'], 'lidl token');
+    Application.LidlToken := GetEx(['t', 'lidl-token'], 'lidl token (see https://github.com/Andre0512/lidl-plus#commandline-tool)');
 
     Application.LidlJsonFilePath :=
       GetEx(['f', 'lidl-filepath'], 'lidl json file (optional)');

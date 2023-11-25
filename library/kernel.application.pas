@@ -191,6 +191,7 @@ begin
     try
       OFFProductInfo := TOpenFoodFactsService.GetProduct(LidlProduct.CodeInput);
     except
+      TLogger.Error('Failed OpenFoodFacts api call', []);
     end;
   end;
 
@@ -220,7 +221,6 @@ begin
 
     Exit;
   end;
-
 
   if (FLidlJsonFilePath <> '') and FileExists(FLidlJsonFilePath) then
   begin
