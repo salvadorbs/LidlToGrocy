@@ -68,7 +68,7 @@ begin
     GrocyProduct.DefaultSetup();
 
     GrocyProduct.Name := OFFProductInfo.ProductName;
-    if (OFFProductInfo.Code <> '') then
+    if (OFFProductInfo.ImageUrl <> '') then
       GrocyProduct.PictureFileName := OFFProductInfo.Code + '.jpg';
 
     with FConfiguration do

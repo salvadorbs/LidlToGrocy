@@ -143,7 +143,7 @@ begin
     try
       TLogger.Info('Insert product %s in Grocy', [OFFProductInfo.ProductName]);
 
-      if (NoProductPicture) then
+      if not (NoProductPicture) then
         InsertOFFImageInGrocy(OFFProductInfo);
 
       GrocyProduct := FGrocyService.CreateProduct(OFFProductInfo);
