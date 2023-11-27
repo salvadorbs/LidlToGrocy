@@ -183,7 +183,7 @@ begin
     TLogger.Info('Adding quantity (%s) in Grocy', [LidlProduct.Quantity]);
     GrocyProductStock := TGrocyProductStock.Create(LidlProduct.Quantity,
       IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays), LidlProduct.CurrentUnitPrice,
-      'purchase', LidlTicket.Date);
+      'purchase', LidlTicket.Date, IntToStr(FConfiguration.GrocyShoppingLocationId));
     try
       if not FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock) then
         TLogger.Error('Error adding quantity to product in Grocy', []);
@@ -222,7 +222,7 @@ begin
     try
       OFFProductInfo := TOpenFoodFactsService.GetProduct(LidlProduct.CodeInput);
     except
-      TLogger.Error('Failed OpenFoodFacts api call', []);
+      TLogger.Error('Product not found in OpenFoodFacts', []);
     end;
   end;
 
@@ -303,6 +303,7 @@ begin
     end;
 
     FConfiguration.LidlTickets.Add(LidlTicket.BarCode);
+    FConfiguration.SaveConfig;
 
     TLogger.InfoExit('Completed processing', []);
 
