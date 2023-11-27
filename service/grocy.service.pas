@@ -302,8 +302,7 @@ begin
   end;
 end;
 
-function TGrocyService.UploadImageFile(ImageStream: TStream; FileName: string
-  ): boolean;
+function TGrocyService.UploadImageFile(ImageStream: TStream; FileName: string): boolean;
 begin
   Result := False;
 

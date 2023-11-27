@@ -61,8 +61,7 @@ begin
   end;
 end;
 
-class function TOpenFoodFactsService.DownloadImage(
-  OFFProductInfo: TOFFProductInfo): TStream;
+class function TOpenFoodFactsService.DownloadImage(OFFProductInfo: TOFFProductInfo): TStream;
 var
   Client: TFPHttpClient;
   FS: TStream;

@@ -15,7 +15,7 @@ type
   private
     FAmount: string;
     FBarcode: string;
-    FId: Integer;
+    FId: integer;
     FNote: string;
     FProductId: integer;
     FQuId: string;
@@ -25,7 +25,7 @@ type
   published
     property Amount: string read FAmount write FAmount;
     property Barcode: string read FBarcode write FBarcode;
-    property Id: Integer read FId write FId default -1;
+    property Id: integer read FId write FId default -1;
     property Note: string read FNote write FNote;
     property ProductId: integer read FProductId write FProductId;
     property QuId: string read FQuId write FQuId;

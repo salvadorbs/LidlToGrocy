@@ -42,7 +42,7 @@ type
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     procedure ConsumeGrocyProduct(LidlProduct: TItemsLine);
     procedure DoHelp(Sender: TObject);
-    function InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): Boolean;
+    function InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): boolean;
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function GetLidlTickets: string;
     function GetOFFProductInfo(var LidlProduct: TItemsLine): TOFFProductInfo;
@@ -91,9 +91,9 @@ begin
   ConsoleWrite(Executable.Command.FullDescription);
 end;
 
-function TLidlToGrocy.InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): Boolean;
+function TLidlToGrocy.InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): boolean;
 var
-  ImageStream : TStream;
+  ImageStream: TStream;
 begin
   Result := False;
   if (OFFProductInfo.ImageUrl = '') then

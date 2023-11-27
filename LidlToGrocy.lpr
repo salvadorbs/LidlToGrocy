@@ -54,9 +54,10 @@ begin
     Application.GrocyPort := GetEx(['p', 'grocy-port'], 'grocy port', '9283');
     Application.GrocyApiKey := GetEx(['a', 'grocy-apikey'], 'grocy api key');
 
-    Application.LidlCountry := GetEx(['c', 'lidl-country'], 'lidl country' , 'EN');
+    Application.LidlCountry := GetEx(['c', 'lidl-country'], 'lidl country', 'EN');
     Application.LidlLanguage := GetEx(['l', 'lidl-lang'], 'lidl language', 'en');
-    Application.LidlToken := GetEx(['t', 'lidl-token'], 'lidl token (see https://github.com/Andre0512/lidl-plus#commandline-tool)');
+    Application.LidlToken := GetEx(['t', 'lidl-token'],
+      'lidl token (see https://github.com/Andre0512/lidl-plus#commandline-tool)');
 
     Application.LidlJsonFilePath :=
       GetEx(['f', 'lidl-filepath'], 'lidl json file (optional)');

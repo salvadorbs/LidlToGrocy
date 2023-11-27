@@ -15,7 +15,7 @@ type
   private
     FErrorMessage: string;
   public
-    function isErrorIntegrityUnique: Boolean;
+    function isErrorIntegrityUnique: boolean;
   published
     property ErrorMessage: string read FErrorMessage write FErrorMessage;
   end;
@@ -24,7 +24,7 @@ implementation
 
 { TGrocyError }
 
-function TGrocyError.isErrorIntegrityUnique(): Boolean;
+function TGrocyError.isErrorIntegrityUnique(): boolean;
 begin
   Result := (FErrorMessage = 'SQLSTATE[23000]: Integrity constraint violation: 19 UNIQUE constraint failed: products.name');
 end;
@@ -34,4 +34,3 @@ initialization
     ['ErrorMessage'], ['error_message']);
 
 end.
-

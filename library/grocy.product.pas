@@ -120,16 +120,16 @@ initialization
     'DefaultBestBeforeDaysAfterFreezing', 'DefaultBestBeforeDaysAfterOpen',
     'DefaultBestBeforeDaysAfterThawing', 'DefaultConsumeLocationId', 'Description', 'DueType',
     'EnableTareWeightHandling', 'HideOnStockOverview', 'Id', 'LocationId', 'MinStockAmount',
-    'MoveOnOpen', 'Name', 'NoOwnStock', 'NotCheckStockFulfillmentForRecipes', 'ParentProductId', 'PictureFileName',
-    'ProductGroupId', 'QuIdConsume', 'QuIdPrice', 'QuIdPurchase', 'QuIdStock', 'QuickConsumeAmount',
-    'QuickOpenAmount', 'ShoppingLocationId', 'ShouldNotBeFrozen', 'TreatOpenedAsOutOfStock'],
+    'MoveOnOpen', 'Name', 'NoOwnStock', 'NotCheckStockFulfillmentForRecipes', 'ParentProductId',
+    'PictureFileName', 'ProductGroupId', 'QuIdConsume', 'QuIdPrice', 'QuIdPurchase', 'QuIdStock',
+    'QuickConsumeAmount', 'QuickOpenAmount', 'ShoppingLocationId', 'ShouldNotBeFrozen', 'TreatOpenedAsOutOfStock'],
     ['active', 'calories', 'cumulate_min_stock_amount_of_sub_products', 'default_best_before_days',
     'default_best_before_days_after_freezing', 'default_best_before_days_after_open',
     'default_best_before_days_after_thawing', 'default_consume_location_id', 'description',
     'due_type', 'enable_tare_weight_handling', 'hide_on_stock_overview', 'id', 'location_id',
     'min_stock_amount', 'move_on_open', 'name', 'no_own_stock', 'not_check_stock_fulfillment_for_recipes',
-    'parent_product_id', 'picture_file_name', 'product_group_id', 'qu_id_consume', 'qu_id_price', 'qu_id_purchase',
-    'qu_id_stock', 'quick_consume_amount', 'quick_open_amount', 'shopping_location_id',
+    'parent_product_id', 'picture_file_name', 'product_group_id', 'qu_id_consume', 'qu_id_price',
+    'qu_id_purchase', 'qu_id_stock', 'quick_consume_amount', 'quick_open_amount', 'shopping_location_id',
     'should_not_be_frozen', 'treat_opened_as_out_of_stock']);
 
 end.

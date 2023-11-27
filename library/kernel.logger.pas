@@ -69,8 +69,7 @@ begin
   DebugLn(['[EXCEPTION] ', E.Message, E]);
 end;
 
-class procedure TLogger.InfoEnter(const AText: string;
-  AParams: array of const);
+class procedure TLogger.InfoEnter(const AText: string; AParams: array of const);
 begin
   DebugLnEnter(['[INFO] ', Format(AText, AParams)]);
 end;
