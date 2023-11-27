@@ -5,7 +5,7 @@ unit Grocy.Service;
 interface
 
 uses
-  Classes, SysUtils, Grocy.Product, mormot.core.json, fphttpclient,
+  Classes, SysUtils, Grocy.Product, mormot.core.json, fphttpclient, base64,
   opensslsockets, mormot.core.os, mormot.core.Text, mormot.core.base,
   Grocy.Barcode, Grocy.ProductStock, OpenFoodFacts.ProductInfo, Kernel.Configuration;
 
@@ -37,7 +37,8 @@ type
     function GetProductByBarcode(Barcode: string): TGrocyProduct;
     function AddProductInStock(GrocyProductId: integer; ProductStock: TGrocyProductStock): boolean;
     function GetProductByName(Name: string): TGrocyProduct;
-    function ConsumeByBarcode(Barcode: string; Amount: Integer): boolean;
+    function ConsumeByBarcode(Barcode: string; Amount: integer): boolean;
+    function UploadImageFile(ImageStream: TStream; FileName: string): boolean;
   end;
 
 const
@@ -47,6 +48,7 @@ const
   UrlAddBarcode: string = 'objects/product_barcodes';
   UrlAddProductStock: string = 'stock/products/%d/add';
   UrlConsumeByBarcode: string = 'stock/products/by-barcode/%s/consume';
+  UrlUploadFile: string = 'files/productpictures/%s';
 
 implementation
 
@@ -66,6 +68,9 @@ begin
     GrocyProduct.DefaultSetup();
 
     GrocyProduct.Name := OFFProductInfo.ProductName;
+    if (OFFProductInfo.Code <> '') then
+      GrocyProduct.PictureFileName := OFFProductInfo.Code + '.jpg';
+
     with FConfiguration do
     begin
       GrocyProduct.Name := OFFProductInfo.ProductName;
@@ -277,15 +282,15 @@ begin
   end;
 end;
 
-function TGrocyService.ConsumeByBarcode(Barcode: string; Amount: Integer): boolean;
+function TGrocyService.ConsumeByBarcode(Barcode: string; Amount: integer): boolean;
 var
-  jObject : TJSONObject;
+  jObject: TJSONObject;
 begin
-  Result := false;
+  Result := False;
   jObject := TJSONObject.Create;
   jObject.Add('amount', Amount);
   jObject.Add('transaction_type', 'consume');
-  jObject.Add('spoiled', false);
+  jObject.Add('spoiled', False);
 
   try
     FClient.RequestBody := TRawByteStringStream.Create(jObject.AsJSON);
@@ -294,6 +299,25 @@ begin
     Result := (FClient.ResponseStatusCode = 200);
     FreeRequestBody;
     jObject.Free;
+  end;
+end;
+
+function TGrocyService.UploadImageFile(ImageStream: TStream; FileName: string
+  ): boolean;
+begin
+  Result := False;
+
+  FileName := EncodeStringBase64(FileName);
+  try
+    FClient.AddHeader('Content-Type', 'application/octet-stream');
+    ImageStream.Position := 0;
+    FClient.RequestBody := ImageStream;
+    FClient.Put(Format(Self.BaseURL + UrlUploadFile, [FileName]));
+  finally
+    Result := (FClient.ResponseStatusCode = 204);
+    FClient.AddHeader('Content-Type', 'application/json');
+
+    FreeRequestBody;
   end;
 end;
 

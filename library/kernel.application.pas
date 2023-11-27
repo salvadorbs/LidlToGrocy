@@ -27,6 +27,7 @@ type
     FLidlLanguage: string;
     FLidlToken: string;
     FNoOpenFoodFacts: boolean;
+    FNoProductPicture: boolean;
     FNoStock: boolean;
     FOnHelp: TNotifyEvent;
     FSaveLidlJson: boolean;
@@ -41,6 +42,7 @@ type
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     procedure ConsumeGrocyProduct(LidlProduct: TItemsLine);
     procedure DoHelp(Sender: TObject);
+    function InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): Boolean;
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function GetLidlTickets: string;
     function GetOFFProductInfo(var LidlProduct: TItemsLine): TOFFProductInfo;
@@ -57,6 +59,7 @@ type
     property ConsumeNow: boolean read FConsumeNow write FConsumeNow;
     property NoStock: boolean read FNoStock write FNoStock;
     property NoOpenFoodFacts: boolean read FNoOpenFoodFacts write FNoOpenFoodFacts;
+    property NoProductPicture: boolean read FNoProductPicture write FNoProductPicture;
     property SaveLidlJson: boolean read FSaveLidlJson write FSaveLidlJson;
 
     property GrocyIp: string read FGrocyIp write FGrocyIp;
@@ -86,6 +89,23 @@ uses
 procedure TLidlToGrocy.DoHelp(Sender: TObject);
 begin
   ConsoleWrite(Executable.Command.FullDescription);
+end;
+
+function TLidlToGrocy.InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): Boolean;
+var
+  ImageStream : TStream;
+begin
+  Result := False;
+  if (OFFProductInfo.ImageUrl = '') then
+    Exit;
+
+  ImageStream := TOpenFoodFactsService.DownloadImage(OFFProductInfo);
+
+  try
+    Result := FGrocyService.UploadImageFile(ImageStream, OFFProductInfo.Code + '.jpg');
+  finally
+    TLogger.Info('Downloaded and uploaded product image in Grocy', []);
+  end;
 end;
 
 function TLidlToGrocy.GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
@@ -118,15 +138,25 @@ begin
   GrocyProduct := nil;
   GrocyBarcode := nil;
 
-  OFFProductInfo := GetOFFProductInfo(LidlProduct);
   try
-    TLogger.Info('Insert product %s in Grocy', [OFFProductInfo.ProductName]);
-    GrocyProduct := FGrocyService.CreateProduct(OFFProductInfo);
-    if Assigned(GrocyProduct) then
-      GrocyBarcode := FGrocyService.AddBarcodeToProduct(GrocyProduct.Id, LidlProduct.CodeInput);
-  finally
-    OFFProductInfo.Free;
-    GrocyBarcode.Free;
+    OFFProductInfo := GetOFFProductInfo(LidlProduct);
+    try
+      TLogger.Info('Insert product %s in Grocy', [OFFProductInfo.ProductName]);
+
+      if (NoProductPicture) then
+        InsertOFFImageInGrocy(OFFProductInfo);
+
+      GrocyProduct := FGrocyService.CreateProduct(OFFProductInfo);
+
+      if Assigned(GrocyProduct) then
+        GrocyBarcode := FGrocyService.AddBarcodeToProduct(GrocyProduct.Id, LidlProduct.CodeInput);
+    finally
+      OFFProductInfo.Free;
+      GrocyBarcode.Free;
+    end;
+  except
+    on E: Exception do
+      TLogger.Exception(E);
   end;
 
   Result := GrocyProduct;
@@ -170,7 +200,8 @@ begin
   Result := '';
   if (FLidlToken <> '') then
   begin
-    TLogger.Info('Run python script lidl-plus with parameters [%s, %s, %s]', [FLidlLanguage, FLidlCountry, FLidlToken]);
+    TLogger.Info('Run python script lidl-plus with parameters [%s, %s, %s]',
+      [FLidlLanguage, FLidlCountry, FLidlToken]);
     output := RunRedirect(Format(LIDL_PLUS_COMMANDLINE, [FLidlLanguage, FLidlCountry, FLidlToken]));
     if output <> '' then
     begin
@@ -212,7 +243,7 @@ var
   LidlTicket: TLidlTicket;
   GrocyProduct: TGrocyProduct;
   LidlProduct: TItemsLine;
-  value: Double;
+  Value: double;
 begin
   if ((FGrocyApiKey = '') or (FLidlToken = '') or (FGrocyApiKey = '')) then
   begin
@@ -243,7 +274,8 @@ begin
   begin
     if (FConfiguration.LidlTickets.IndexOf(LidlTicket.BarCode) <> -1) then
     begin
-      TLogger.Info('LIDL receipt already inserted in Grocy (barcode %s). I move on to the next one', [LidlTicket.BarCode]);
+      TLogger.Info('LIDL receipt already inserted in Grocy (barcode %s). I move on to the next one',
+        [LidlTicket.BarCode]);
       continue;
     end;
 
@@ -253,8 +285,8 @@ begin
       TLogger.InfoEnter('Started processing item (barcode %s)', [LidlProduct.CodeInput]);
       GrocyProduct := nil;
       try
-        if TryStrToFloat(LidlProduct.Quantity, value) and (frac(value) <> 0) then
-          LidlProduct.Quantity := IntToStr(Ceil(value));
+        if TryStrToFloat(LidlProduct.Quantity, Value) and (frac(Value) <> 0) then
+          LidlProduct.Quantity := IntToStr(Ceil(Value));
 
         GrocyProduct := GetGrocyProduct(LidlProduct);
 

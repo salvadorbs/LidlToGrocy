@@ -33,6 +33,7 @@ type
     FNoOwnStock: string;
     FNotCheckStockFulfillmentForRecipes: string;
     FParentProductId: string;
+    FPictureFileName: string;
     FProductGroupId: string;
     FQuIdConsume: string;
     FQuIdPrice: string;
@@ -71,6 +72,7 @@ type
     property NotCheckStockFulfillmentForRecipes: string read FNotCheckStockFulfillmentForRecipes
       write FNotCheckStockFulfillmentForRecipes;
     property ParentProductId: string read FParentProductId write FParentProductId;
+    property PictureFileName: string read FPictureFileName write FPictureFileName;
     property ProductGroupId: string read FProductGroupId write FProductGroupId;
     property QuIdConsume: string read FQuIdConsume write FQuIdConsume;
     property QuIdPrice: string read FQuIdPrice write FQuIdPrice;
@@ -118,7 +120,7 @@ initialization
     'DefaultBestBeforeDaysAfterFreezing', 'DefaultBestBeforeDaysAfterOpen',
     'DefaultBestBeforeDaysAfterThawing', 'DefaultConsumeLocationId', 'Description', 'DueType',
     'EnableTareWeightHandling', 'HideOnStockOverview', 'Id', 'LocationId', 'MinStockAmount',
-    'MoveOnOpen', 'Name', 'NoOwnStock', 'NotCheckStockFulfillmentForRecipes', 'ParentProductId',
+    'MoveOnOpen', 'Name', 'NoOwnStock', 'NotCheckStockFulfillmentForRecipes', 'ParentProductId', 'PictureFileName',
     'ProductGroupId', 'QuIdConsume', 'QuIdPrice', 'QuIdPurchase', 'QuIdStock', 'QuickConsumeAmount',
     'QuickOpenAmount', 'ShoppingLocationId', 'ShouldNotBeFrozen', 'TreatOpenedAsOutOfStock'],
     ['active', 'calories', 'cumulate_min_stock_amount_of_sub_products', 'default_best_before_days',
@@ -126,7 +128,7 @@ initialization
     'default_best_before_days_after_thawing', 'default_consume_location_id', 'description',
     'due_type', 'enable_tare_weight_handling', 'hide_on_stock_overview', 'id', 'location_id',
     'min_stock_amount', 'move_on_open', 'name', 'no_own_stock', 'not_check_stock_fulfillment_for_recipes',
-    'parent_product_id', 'product_group_id', 'qu_id_consume', 'qu_id_price', 'qu_id_purchase',
+    'parent_product_id', 'picture_file_name', 'product_group_id', 'qu_id_consume', 'qu_id_price', 'qu_id_purchase',
     'qu_id_stock', 'quick_consume_amount', 'quick_open_amount', 'shopping_location_id',
     'should_not_be_frozen', 'treat_opened_as_out_of_stock']);
 

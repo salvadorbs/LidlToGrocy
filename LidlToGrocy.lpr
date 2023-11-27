@@ -45,9 +45,10 @@ begin
     Application.Help := Option(['?', 'help'], 'display this message');
     Application.NoStock := Option(['n', 'no-add-stock'], 'don''t add product in stock');
     Application.NoOpenFoodFacts :=
-      Option(['c', 'no-call-openfoodfacts'], 'don''t get product infos from openfoodfacts');
+      Option(['c', 'no-openfoodfacts'], 'don''t get product infos from openfoodfacts');
     Application.SaveLidlJson := Option(['s', 'save-lidl-json'], 'save lidl json in a file (lidl.json)');
     Application.ConsumeNow := Option(['o', 'consume-now'], 'consume grocy product after adding');
+    Application.NoProductPicture := Option(['r', 'no-picture'], 'don''t get openfoodfacts image in grocy');
 
     Application.GrocyIp := GetEx(['i', 'grocy-ip'], 'grocy ip address');
     Application.GrocyPort := GetEx(['p', 'grocy-port'], 'grocy port', '9283');

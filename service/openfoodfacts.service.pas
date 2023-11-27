@@ -15,12 +15,16 @@ type
   private
   public
     class function GetProduct(BarCode: string): TOFFProductInfo;
+    class function DownloadImage(OFFProductInfo: TOFFProductInfo): TStream;
   end;
 
 const
   BaseUrl: string = 'https://it.openfoodfacts.org/api/v2/product/';
 
 implementation
+
+uses
+  kernel.logger;
 
 class function TOpenFoodFactsService.GetProduct(BarCode: string): TOFFProductInfo;
 var
@@ -51,6 +55,33 @@ begin
         if Result = nil then
           OFFProductInfo.Free;
       end;
+    end;
+  finally
+    Client.Free;
+  end;
+end;
+
+class function TOpenFoodFactsService.DownloadImage(
+  OFFProductInfo: TOFFProductInfo): TStream;
+var
+  Client: TFPHttpClient;
+  FS: TStream;
+begin
+  Result := nil;
+
+  Client := TFPHttpClient.Create(nil);
+  FS := TMemoryStream.Create;
+  try
+    try
+      Client.AllowRedirect := True;
+      Client.Get(OFFProductInfo.ImageUrl, FS);
+
+      Result := FS;
+    except
+      on E: EHttpClient do
+        TLogger.Exception(E)
+      else
+        raise;
     end;
   finally
     Client.Free;
