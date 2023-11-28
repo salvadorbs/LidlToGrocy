@@ -2,7 +2,7 @@ This software is unofficial and is not related in any way to Lidl or Grocy. It i
 
 # lidltogrocy
 
-An command line executable to add easily your Lidl receipts into [Grocy](https://github.com/grocy/grocy).
+An command line executable to add easily your Lidl receipts into [Grocy](https://github.com/grocy/grocy). Inspired by [LidGroSyncer](https://github.com/vorostamas/LidGroSyncer).
 
 ## Key Features
 
@@ -16,6 +16,7 @@ An command line executable to add easily your Lidl receipts into [Grocy](https:/
 ## Usage
 
 * Install [lidl-plus](https://github.com/Andre0512/lidl-plus) using Pip
+* Get [lidl token](https://github.com/Andre0512/lidl-pluscommandline-tool)
 * Fill settings.json
 * Run LidlToGrocy executable with grocy and lidl-plus params
 
@@ -26,10 +27,11 @@ Options:
   /v, /verbose        generate verbose output
   /?, /help           display this message
   /n, /no-add-stock   don't add product in stock
-  /c, /no-call-openfoodfacts
+  /c, /no-openfoodfacts
                       don't get product infos from openfoodfacts
   /s, /save-lidl-json save lidl json in a file (lidl.json)
   /o, /consume-now    consume grocy product after adding
+  /r, /no-picture     don't get openfoodfacts image in grocy
 
 Params:
   /i, /grocy-ip <value>
@@ -42,8 +44,10 @@ Params:
                       lidl country
   /l, /lidl-lang <value> (default en)
                       lidl language
-  /t, /lidl-token <value>
-                      lidl token (see https://github.com/Andre0512/lidl-plus#commandline-tool)
+  /t, /lidl-token <commandline-tool)>
+                      lidl token (see https://github.com/Andre0512/lidl-pluscommandline-tool)
   /f, /lidl-filepath <value>
                       lidl json file (optional)
+
+
 ```

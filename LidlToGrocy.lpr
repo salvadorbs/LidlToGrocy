@@ -37,7 +37,7 @@ begin
 
   with Executable.Command do
   begin
-    ExeDescription := 'An executable to add easily your Lidl receipts into Grocy ' + VERSION + ' [!!!UNSTABLE!!!]';
+    ExeDescription := 'An executable to add easily your Lidl receipts into Grocy ' + VERSION;
 
     Application := TLidlToGrocy.Create(nil);
 
