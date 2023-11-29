@@ -5,7 +5,7 @@ unit Grocy.ProductStock;
 interface
 
 uses
-  Classes, SysUtils, mormot.core.json, mormot.core.rtti;
+  Classes, SysUtils, mormot.core.json, mormot.core.rtti, Lidl.ItemsLine;
 
 type
 
@@ -20,8 +20,8 @@ type
     FShoppingLocationId: string;
     FTransactionType: string;
   public
-    constructor Create(Amount: string; BestBeforeDate: TDateTime; Price: string;
-      TransactionType: string; PurchasedDate: TDateTime; ShoppingLocationId: string); overload;
+    constructor Create(LidlProduct: TItemsLine; BestBeforeDate: TDateTime; TransactionType: string;
+      PurchasedDate: TDateTime; ShoppingLocationId: string); overload;
   published
     property Amount: string read FAmount write FAmount;
     property BestBeforeDate: TDateTime read FBestBeforeDate write FBestBeforeDate;
@@ -35,16 +35,37 @@ implementation
 
 { TGrocyProductStock }
 
-constructor TGrocyProductStock.Create(Amount: string; BestBeforeDate: TDateTime; Price: string;
+constructor TGrocyProductStock.Create(LidlProduct: TItemsLine; BestBeforeDate: TDateTime;
   TransactionType: string; PurchasedDate: TDateTime; ShoppingLocationId: string);
+var
+  I: integer;
+  TotalDiscounts, CurrentUnitPrice, Total: Real;
+  fs: TFormatSettings;
 begin
   inherited Create;
-  FAmount := Amount;
+  FAmount := LidlProduct.Quantity;
   FBestBeforeDate := Trunc(BestBeforeDate);
-  FPrice := StringReplace(Price, ',', '.', [rfReplaceAll]);
   FShoppingLocationId := ShoppingLocationId;
   FTransactionType := TransactionType;
   FPurchasedDate := Trunc(PurchasedDate);
+
+  fs := DefaultFormatSettings;
+  fs.ThousandSeparator := '.';
+  fs.DecimalSeparator  := ',';
+
+  TotalDiscounts := 0;
+  for I := 0 to length(LidlProduct.Discounts) - 1 do
+    TotalDiscounts := TotalDiscounts + StrToFloatDef(LidlProduct.Discounts[I].Amount, 0, fs);
+
+  CurrentUnitPrice := StrToFloatDef(LidlProduct.CurrentUnitPrice, 0, fs);
+
+  Total := CurrentUnitPrice;
+  if (CurrentUnitPrice >= TotalDiscounts) then
+    Total := CurrentUnitPrice - TotalDiscounts;
+
+  fs.ThousandSeparator := ',';
+  fs.DecimalSeparator  := '.';
+  FPrice := FloatToStr(Total, fs);
 end;
 
 initialization

@@ -181,8 +181,8 @@ begin
   if not (FNoStock) then
   begin
     TLogger.Info('Adding quantity (%s) in Grocy', [LidlProduct.Quantity]);
-    GrocyProductStock := TGrocyProductStock.Create(LidlProduct.Quantity,
-      IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays), LidlProduct.CurrentUnitPrice,
+    GrocyProductStock := TGrocyProductStock.Create(LidlProduct,
+      IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays),
       'purchase', LidlTicket.Date, IntToStr(FConfiguration.GrocyShoppingLocationId));
     try
       if not FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock) then
