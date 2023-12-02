@@ -45,6 +45,7 @@ type
     FShouldNotBeFrozen: string;
     FTreatOpenedAsOutOfStock: string;
   public
+    constructor Create(Source: TGrocyProduct); overload;
     procedure DefaultSetup();
   published
     property Active: string read FActive write FActive;
@@ -90,6 +91,41 @@ type
 implementation
 
 { TGrocyProduct }
+
+constructor TGrocyProduct.Create(Source: TGrocyProduct);
+begin
+  FActive := Source.Active;
+  FCalories := Source.Calories;
+  FCumulateMinStockAmountOfSubProducts := Source.CumulateMinStockAmountOfSubProducts;
+  FDefaultBestBeforeDays := Source.DefaultBestBeforeDays;
+  FDefaultBestBeforeDaysAfterFreezing := Source.DefaultBestBeforeDaysAfterFreezing;
+  FDefaultBestBeforeDaysAfterOpen := Source.DefaultBestBeforeDaysAfterOpen;
+  FDefaultBestBeforeDaysAfterThawing := Source.DefaultBestBeforeDaysAfterThawing;
+  FDefaultConsumeLocationId := Source.DefaultConsumeLocationId;
+  FDescription := Source.Description;
+  FDueType := Source.DueType;
+  FEnableTareWeightHandling := Source.EnableTareWeightHandling;
+  FHideOnStockOverview := Source.HideOnStockOverview;
+  FId := Source.Id;
+  FLocationId := Source.LocationId;
+  FMinStockAmount := Source.MinStockAmount;
+  FMoveOnOpen := Source.MoveOnOpen;
+  FName := Source.Name;
+  FNoOwnStock := Source.NoOwnStock;
+  FNotCheckStockFulfillmentForRecipes := Source.NotCheckStockFulfillmentForRecipes;
+  FParentProductId := Source.ParentProductId;
+  FPictureFileName := Source.PictureFileName;
+  FProductGroupId := Source.ProductGroupId;
+  FQuIdConsume := Source.QuIdConsume;
+  FQuIdPrice := Source.QuIdPrice;
+  FQuIdPurchase := Source.QuIdPurchase;
+  FQuIdStock := Source.QuIdStock;
+  FQuickConsumeAmount := Source.QuickConsumeAmount;
+  FQuickOpenAmount := Source.QuickOpenAmount;
+  FShoppingLocationId := Source.ShoppingLocationId;
+  FShouldNotBeFrozen := Source.ShouldNotBeFrozen;
+  FTreatOpenedAsOutOfStock := Source.TreatOpenedAsOutOfStock
+end;
 
 procedure TGrocyProduct.DefaultSetup();
 begin

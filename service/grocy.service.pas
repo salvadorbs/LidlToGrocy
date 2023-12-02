@@ -5,7 +5,7 @@ unit Grocy.Service;
 interface
 
 uses
-  Classes, SysUtils, Grocy.Product, mormot.core.json, fphttpclient, base64,
+  Classes, SysUtils, Grocy.Product, mormot.core.json, fphttpclient, base64, ssockets,
   opensslsockets, mormot.core.os, mormot.core.Text, mormot.core.base,
   Grocy.Barcode, Grocy.ProductStock, OpenFoodFacts.ProductInfo, Kernel.Configuration;
 
@@ -187,6 +187,8 @@ begin
     end
     else if (FClient.ResponseStatusCode = 400) then
     begin
+      FreeRequestBody;
+
       GrocyError := TGrocyError.Create;
       try
         LoadJson(GrocyError, Response, TypeInfo(TGrocyError));
@@ -194,17 +196,15 @@ begin
         begin
           TLogger.Error('Failed to add a new product in Grocy due to violation of the uniqueness of the product name %s',
             [GrocyProduct.Name]);
-          FreeRequestBody;
 
           TLogger.Info('Finding Grocy product with same name "%s"', [GrocyProduct.Name]);
           Result := GetProductByName(GrocyProduct.Name);
           if Assigned(Result) then
             TLogger.Info('Found! Grocy Product ID = %d', [Result.Id]);
-
-          // Now GrocyProduct doesn't need anymore
-          GrocyProduct.Free;
-          GrocyProduct := nil;
         end;
+        // Now GrocyProduct doesn't need anymore
+        GrocyProduct.Free;
+        GrocyProduct := nil;
       finally
         GrocyError.Free;
       end;
@@ -230,7 +230,9 @@ begin
     begin
       GrocyBarcode.Id := GetIdFromJsonGrocy(Response, 'created_object_id');
       Result := GrocyBarcode;
-    end;
+    end
+    else
+      GrocyBarcode.Free;
 
     FreeRequestBody;
   end;
@@ -243,7 +245,12 @@ begin
   Result := nil;
 
   try
-    Response := FClient.Get(Format(Self.BaseURL + UrlProductByBarcode, [Barcode]));
+    try
+      Response := FClient.Get(Format(Self.BaseURL + UrlProductByBarcode, [Barcode]));
+    except
+      on E: ESocketError do
+        TLogger.Exception(E);
+    end;
   finally
     if (FClient.ResponseStatusCode = 200) then
       Result := GetGrocyProductFromJson(Response);
@@ -256,7 +263,12 @@ begin
 
   try
     FClient.RequestBody := TRawByteStringStream.Create(ObjectToJson(ProductStock));
-    FClient.Post(Format(Self.BaseURL + UrlAddProductStock, [GrocyProductId]));
+    try
+      FClient.Post(Format(Self.BaseURL + UrlAddProductStock, [GrocyProductId]));
+    except
+      on E: ESocketError do
+        TLogger.Exception(E);
+    end;
   finally
     Result := (FClient.ResponseStatusCode = 200);
 
@@ -268,16 +280,31 @@ function TGrocyService.GetProductByName(Name: string): TGrocyProduct;
 var
   Response: string;
   GrocyProducts: TGrocyProductArray;
+  I: integer;
 begin
   Result := nil;
+  GrocyProducts := nil;
   try
-    Response := FClient.Get(Format(Self.BaseURL + UrlProductByName, [EncodeURLElement(Name)]));
+    try
+      Response := FClient.Get(Format(Self.BaseURL + UrlProductByName, [EncodeURLElement(Name)]));
+    except
+      on E: ESocketError do
+        TLogger.Exception(E);
+    end;
   finally
     if (FClient.ResponseStatusCode = 200) then
     begin
       DynArrayLoadJson(GrocyProducts, Response, TypeInfo(TGrocyProductArray));
+
       if Length(GrocyProducts) = 1 then
-        Result := GrocyProducts[0];
+        Result := TGrocyProduct.Create(GrocyProducts[0]);
+
+      if Assigned(GrocyProducts) then
+      begin
+        for I := 0 to Length(GrocyProducts) - 1 do
+          GrocyProducts[I].Free;
+        SetLength(GrocyProducts, 0);
+      end;
     end;
   end;
 end;
@@ -294,7 +321,12 @@ begin
 
   try
     FClient.RequestBody := TRawByteStringStream.Create(jObject.AsJSON);
-    FClient.Post(Format(Self.BaseURL + UrlConsumeByBarcode, [Barcode]));
+    try
+      FClient.Post(Format(Self.BaseURL + UrlConsumeByBarcode, [Barcode]));
+    except
+      on E: ESocketError do
+        TLogger.Exception(E);
+    end;
   finally
     Result := (FClient.ResponseStatusCode = 200);
     FreeRequestBody;
@@ -311,7 +343,12 @@ begin
     FClient.AddHeader('Content-Type', 'application/octet-stream');
     ImageStream.Position := 0;
     FClient.RequestBody := ImageStream;
-    FClient.Put(Format(Self.BaseURL + UrlUploadFile, [FileName]));
+    try
+      FClient.Put(Format(Self.BaseURL + UrlUploadFile, [FileName]));
+    except
+      on E: ESocketError do
+        TLogger.Exception(E);
+    end;
   finally
     Result := (FClient.ResponseStatusCode = 204);
     FClient.AddHeader('Content-Type', 'application/json');

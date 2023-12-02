@@ -209,9 +209,6 @@
   </CompilerOptions>
   <Debugging>
     <Exceptions>
-      <Item>
-        <Name Value="EHTTPClient"/>
-      </Item>
     </Exceptions>
   </Debugging>
 </CONFIG>

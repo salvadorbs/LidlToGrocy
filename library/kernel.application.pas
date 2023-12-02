@@ -111,16 +111,25 @@ end;
 function TLidlToGrocy.GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
 var
   GrocyProduct: TGrocyProduct;
+
+  procedure InternalAddNewGrocyProduct;
+  begin
+    TLogger.Info('Not found!', []);
+    //In case of product doesn't exists in Grocy
+    GrocyProduct := AddNewGrocyProduct(LidlProduct);
+  end;
+
 begin
   TLogger.Info('Find product in Grocy', []);
   GrocyProduct := nil;
   try
     GrocyProduct := FGrocyService.GetProductByBarcode(LidlProduct.CodeInput);
-    TLogger.Info('Found! Grocy Product ID = %d', [GrocyProduct.Id]);
+    if Assigned(GrocyProduct) then
+      TLogger.Info('Found! Grocy Product ID = %d', [GrocyProduct.Id])
+    else
+      InternalAddNewGrocyProduct;
   except
-    TLogger.Info('Not found!', []);
-    //In case of product doesn't exists in Grocy
-    GrocyProduct := AddNewGrocyProduct(LidlProduct);
+    InternalAddNewGrocyProduct;
   end;
 
   Result := GrocyProduct;
@@ -151,8 +160,10 @@ begin
       if Assigned(GrocyProduct) then
         GrocyBarcode := FGrocyService.AddBarcodeToProduct(GrocyProduct.Id, LidlProduct.CodeInput);
     finally
-      OFFProductInfo.Free;
-      GrocyBarcode.Free;
+      if Assigned(OFFProductInfo) then
+        OFFProductInfo.Free;
+      if Assigned(GrocyBarcode) then
+        GrocyBarcode.Free;
     end;
   except
     on E: Exception do
@@ -306,8 +317,6 @@ begin
     FConfiguration.SaveConfig;
 
     TLogger.InfoExit('Completed processing', []);
-
-    Sleep(30000);
   end;
 
   Terminate;
@@ -335,7 +344,7 @@ begin
 
   if Assigned(FLidlTickets) then
   begin
-    for I := 0 to length(FLidlTickets) - 1 do
+    for I := 0 to Length(FLidlTickets) - 1 do
       FLidlTickets[I].Free;
     SetLength(FLidlTickets, 0);
   end;
