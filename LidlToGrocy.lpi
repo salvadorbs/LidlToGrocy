@@ -81,7 +81,7 @@
       <Unit>
         <Filename Value="library\lidl.payments.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="lidl.Payments"/>
+        <UnitName Value="Lidl.Payments"/>
       </Unit>
       <Unit>
         <Filename Value="library\lidl.currency.pas"/>
@@ -162,6 +162,11 @@
         <Filename Value="library\grocy.error.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Grocy.Error"/>
+      </Unit>
+      <Unit>
+        <Filename Value="library\kernel.ticket.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Kernel.Ticket"/>
       </Unit>
     </Units>
   </ProjectOptions>

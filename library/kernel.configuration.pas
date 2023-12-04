@@ -5,7 +5,7 @@ unit Kernel.Configuration;
 interface
 
 uses
-  Classes, SysUtils, jsonConf;
+  Classes, SysUtils, jsonConf, Kernel.Ticket, mormot.core.base;
 
 type
 
@@ -21,7 +21,7 @@ type
     FGrocyQuIdPurchase: integer;
     FGrocyQuIdStock: integer;
     FGrocyShoppingLocationId: integer;
-    FLidlTickets: TStringList;
+    FLidlTickets: TTicketArray;
 
     procedure RestoreSettings(AJSONConfig: TJSONConfig);
     procedure SaveSettings(AJSONConfig: TJSONConfig);
@@ -39,10 +39,16 @@ type
     property GrocyQuIdPurchase: integer read FGrocyQuIdPurchase write FGrocyQuIdPurchase;
     property GrocyQuIdConsume: integer read FGrocyQuIdConsume write FGrocyQuIdConsume;
     property GrocyQuIdPrice: integer read FGrocyQuIdPrice write FGrocyQuIdPrice;
-    property LidlTickets: TStringList read FLidlTickets write FLidlTickets;
+    property LidlTickets: TTicketArray read FLidlTickets write FLidlTickets;
+
+    procedure InsertTicket(Ticket: TTicket);
+    function FindTicket(Id: string): TTicket;
 
     procedure LoadConfig;
     procedure SaveConfig;
+
+    procedure LoadTickets;
+    procedure SaveTickets;
   end;
 
 const
@@ -55,11 +61,13 @@ const
   CONFIG_GROCY_QUIDPURCHASE = 'grocy/qu_id_purchase';
   CONFIG_GROCY_QUIDCONSUME = 'grocy/qu_id_consume';
   CONFIG_GROCY_QUIDPRICE = 'grocy/qu_id_price';
-  CONFIG_LIDL_TICKETS = 'lidl/tickets';
 
 implementation
 
-{ TConfiguration }
+uses
+  mormot.core.json, mormot.core.os;
+
+  { TConfiguration }
 
 procedure TConfiguration.RestoreSettings(AJSONConfig: TJSONConfig);
 begin
@@ -75,7 +83,6 @@ begin
   GrocyQuIdPurchase := AJSONConfig.GetValue(CONFIG_GROCY_QUIDPURCHASE, Self.GrocyQuIdPurchase);
   GrocyQuIdConsume := AJSONConfig.GetValue(CONFIG_GROCY_QUIDCONSUME, Self.GrocyQuIdConsume);
   GrocyQuIdPrice := AJSONConfig.GetValue(CONFIG_GROCY_QUIDPRICE, Self.GrocyQuIdPrice);
-  AJSONConfig.GetValue(CONFIG_LIDL_TICKETS, Self.LidlTickets, '');
 end;
 
 procedure TConfiguration.SaveSettings(AJSONConfig: TJSONConfig);
@@ -89,7 +96,6 @@ begin
   AJSONConfig.SetValue(CONFIG_GROCY_QUIDPURCHASE, Self.GrocyQuIdPurchase);
   AJSONConfig.SetValue(CONFIG_GROCY_QUIDCONSUME, Self.GrocyQuIdConsume);
   AJSONConfig.SetValue(CONFIG_GROCY_QUIDPRICE, Self.GrocyQuIdPrice);
-  AJSONConfig.SetValue(CONFIG_LIDL_TICKETS, Self.LidlTickets);
 end;
 
 constructor TConfiguration.Create;
@@ -103,15 +109,40 @@ begin
   FGrocyQuIdPurchase := 3;
   FGrocyQuIdConsume := 2;
   FGrocyQuIdPrice := 3;
-
-  FLidlTickets := TStringList.Create;
 end;
 
 destructor TConfiguration.Destroy;
+var
+  I: integer;
 begin
-  FLidlTickets.Free;
+  if Assigned(FLidlTickets) then
+  begin
+    for I := 0 to Length(FLidlTickets) - 1 do
+      FLidlTickets[I].Free;
+    SetLength(FLidlTickets, 0);
+  end;
 
   inherited Destroy;
+end;
+
+procedure TConfiguration.InsertTicket(Ticket: TTicket);
+begin
+  Insert(Ticket, FLidlTickets, 0);
+end;
+
+function TConfiguration.FindTicket(Id: string): TTicket;
+var
+  Ticket: TTicket;
+begin
+  Result := nil;
+  for Ticket in FLidlTickets do
+  begin
+    if (Ticket.Id = Id) then
+    begin
+      Result := Ticket;
+      break;
+    end;
+  end;
 end;
 
 procedure TConfiguration.LoadConfig;
@@ -144,6 +175,22 @@ begin
   finally
     JSONConfig.Free;
   end;
+end;
+
+procedure TConfiguration.LoadTickets;
+var
+  json: RawUtf8;
+begin
+  json := StringFromFile(IncludeTrailingPathDelimiter(GetCurrentDir) + 'tickets.json');
+  DynArrayLoadJson(FLidlTickets, json, TypeInfo(TTicketArray));
+end;
+
+procedure TConfiguration.SaveTickets;
+var
+  json: RawUtf8;
+begin
+  json := DynArraySaveJson(FLidlTickets, TypeInfo(TTicketArray));
+  JsonReformatToFile(json, IncludeTrailingPathDelimiter(GetCurrentDir) + 'tickets.json');
 end;
 
 end.

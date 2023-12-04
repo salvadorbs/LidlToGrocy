@@ -37,10 +37,10 @@ type
     FConfiguration: TConfiguration;
     FGrocyService: TGrocyService;
 
-    procedure AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
-      const LidlTicket: TLidlTicket);
+    function AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
+      const LidlTicket: TLidlTicket): boolean;
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
-    procedure ConsumeGrocyProduct(LidlProduct: TItemsLine);
+    function ConsumeGrocyProduct(LidlProduct: TItemsLine): boolean;
     procedure DoHelp(Sender: TObject);
     function InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): boolean;
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
@@ -82,7 +82,7 @@ const
 implementation
 
 uses
-  OpenFoodFacts.Service, Grocy.ProductStock, DateUtils, Kernel.Logger;
+  OpenFoodFacts.Service, Grocy.ProductStock, DateUtils, Kernel.Logger, Kernel.Ticket;
 
   { TGrocyFastLidlAdder }
 
@@ -175,28 +175,33 @@ begin
     TLogger.InfoExit('Product inserted in Grocy. ID = %d', [GrocyProduct.Id]);
 end;
 
-procedure TLidlToGrocy.ConsumeGrocyProduct(LidlProduct: TItemsLine);
+function TLidlToGrocy.ConsumeGrocyProduct(LidlProduct: TItemsLine): boolean;
 begin
+  Result := False;
+
   if (FConsumeNoW) then
   begin
     TLogger.Info('Consume product now', [LidlProduct.Quantity]);
-    FGrocyService.ConsumeByBarcode(LidlProduct.CodeInput, StrToInt(LidlProduct.Quantity));
+    Result := FGrocyService.ConsumeByBarcode(LidlProduct.CodeInput, StrToInt(LidlProduct.Quantity));
   end;
 end;
 
-procedure TLidlToGrocy.AddGrocyProductInStock(const LidlProduct: TItemsLine;
-  const GrocyProduct: TGrocyProduct; const LidlTicket: TLidlTicket);
+function TLidlToGrocy.AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
+  const LidlTicket: TLidlTicket): boolean;
 var
   GrocyProductStock: TGrocyProductStock;
 begin
+  Result := False;
+
   if not (FNoStock) then
   begin
     TLogger.Info('Adding quantity (%s) in Grocy', [LidlProduct.Quantity]);
-    GrocyProductStock := TGrocyProductStock.Create(LidlProduct,
-      IncDay(LidlTicket.Date, FConfiguration.GrocyDefaultBestBeforeDays),
-      'purchase', LidlTicket.Date, IntToStr(FConfiguration.GrocyShoppingLocationId));
+    GrocyProductStock := TGrocyProductStock.Create(LidlProduct, IncDay(LidlTicket.Date,
+      FConfiguration.GrocyDefaultBestBeforeDays), 'purchase', LidlTicket.Date,
+      IntToStr(FConfiguration.GrocyShoppingLocationId));
     try
-      if not FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock) then
+      Result := FGrocyService.AddProductInStock(GrocyProduct.Id, GrocyProductStock);
+      if not Result then
         TLogger.Error('Error adding quantity to product in Grocy', []);
     finally
       GrocyProductStock.Free;
@@ -255,6 +260,7 @@ var
   GrocyProduct: TGrocyProduct;
   LidlProduct: TItemsLine;
   Value: double;
+  Ticket: TTicket;
 begin
   if ((FGrocyApiKey = '') or (FLidlToken = '') or (FGrocyApiKey = '')) then
   begin
@@ -283,11 +289,12 @@ begin
 
   for LidlTicket in FLidlTickets do
   begin
-    if (FConfiguration.LidlTickets.IndexOf(LidlTicket.BarCode) <> -1) then
+    Ticket := FConfiguration.FindTicket(LidlTicket.BarCode);
+    if (Ticket = nil) then
     begin
-      TLogger.Info('LIDL receipt already inserted in Grocy (barcode %s). I move on to the next one',
-        [LidlTicket.BarCode]);
-      continue;
+      Ticket := TTicket.Create;
+      Ticket.Id := LidlTicket.BarCode;
+      FConfiguration.InsertTicket(Ticket);
     end;
 
     TLogger.InfoEnter('Started processing LIDL receipt (barcode %s)', [LidlTicket.BarCode]);
@@ -303,9 +310,24 @@ begin
 
         if Assigned(GrocyProduct) then
         begin
-          AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket);
-          ConsumeGrocyProduct(LidlProduct);
+          if (Ticket.StockedProducts.IndexOf(LidlProduct.CodeInput) = -1) then
+          begin
+            if AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket) then
+              Ticket.StockedProducts.Add(LidlProduct.CodeInput);
+          end
+          else
+            TLogger.Info('Product already added in Grocy Stock with this receipt', []);
+
+          if (Ticket.ConsumedProducts.IndexOf(LidlProduct.CodeInput) = -1) then
+          begin
+            if ConsumeGrocyProduct(LidlProduct) then
+              Ticket.ConsumedProducts.Add(LidlProduct.CodeInput);
+          end
+          else
+            TLogger.Info('Product already consumed in Grocy with this receipt', []);
         end;
+
+        FConfiguration.SaveTickets;
       finally
         if Assigned(GrocyProduct) then
           GrocyProduct.Free;
@@ -313,7 +335,6 @@ begin
       TLogger.InfoExit('Completed processing', []);
     end;
 
-    FConfiguration.LidlTickets.Add(LidlTicket.BarCode);
     FConfiguration.SaveConfig;
 
     TLogger.InfoExit('Completed processing', []);
@@ -334,6 +355,7 @@ begin
 
   FConfiguration := TConfiguration.Create;
   FConfiguration.LoadConfig;
+  FConfiguration.LoadTickets;
 end;
 
 destructor TLidlToGrocy.Destroy;
