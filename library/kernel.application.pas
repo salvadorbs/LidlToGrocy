@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, mormot.core.os, CustApp, Lidl.Ticket, Kernel.Configuration,
   OpenFoodFacts.ProductInfo, Lidl.ItemsLine, mormot.core.json, mormot.core.base,
-  Grocy.Service, Grocy.Barcode, Grocy.Product, mormot.core.log, Math;
+  Grocy.Service, Grocy.Barcode, Grocy.Product, mormot.core.log, Math, Kernel.Ticket;
 
 type
 
@@ -40,12 +40,15 @@ type
     function AddGrocyProductInStock(const LidlProduct: TItemsLine; const GrocyProduct: TGrocyProduct;
       const LidlTicket: TLidlTicket): boolean;
     function AddNewGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
+    procedure CheckMandatoryParams;
     function ConsumeGrocyProduct(LidlProduct: TItemsLine): boolean;
     procedure DoHelp(Sender: TObject);
     function InsertOFFImageInGrocy(OFFProductInfo: TOFFProductInfo): boolean;
     function GetGrocyProduct(LidlProduct: TItemsLine): TGrocyProduct;
     function GetLidlTickets: string;
     function GetOFFProductInfo(var LidlProduct: TItemsLine): TOFFProductInfo;
+    procedure LoadLidlJson;
+    procedure ProcessLidlTicket(const Ticket: TTicket; const LidlTicket: TLidlTicket);
   protected
     procedure DoRun; override;
   public
@@ -82,7 +85,7 @@ const
 implementation
 
 uses
-  OpenFoodFacts.Service, Grocy.ProductStock, DateUtils, Kernel.Logger, Kernel.Ticket;
+  OpenFoodFacts.Service, Grocy.ProductStock, DateUtils, Kernel.Logger;
 
   { TGrocyFastLidlAdder }
 
@@ -175,6 +178,17 @@ begin
     TLogger.InfoExit('Product inserted in Grocy. ID = %d', [GrocyProduct.Id]);
 end;
 
+procedure TLidlToGrocy.CheckMandatoryParams;
+begin
+  if ((FGrocyApiKey = '') or (FLidlToken = '') or (FGrocyApiKey = '')) then
+  begin
+    ConsoleWrite(Executable.Command.FullDescription);
+    Terminate;
+
+    Exit;
+  end;
+end;
+
 function TLidlToGrocy.ConsumeGrocyProduct(LidlProduct: TItemsLine): boolean;
 begin
   Result := False;
@@ -254,22 +268,8 @@ begin
   Result := OFFProductInfo;
 end;
 
-procedure TLidlToGrocy.DoRun;
-var
-  LidlTicket: TLidlTicket;
-  GrocyProduct: TGrocyProduct;
-  LidlProduct: TItemsLine;
-  Value: double;
-  Ticket: TTicket;
+procedure TLidlToGrocy.LoadLidlJson;
 begin
-  if ((FGrocyApiKey = '') or (FLidlToken = '') or (FGrocyApiKey = '')) then
-  begin
-    ConsoleWrite(Executable.Command.FullDescription);
-    Terminate;
-
-    Exit;
-  end;
-
   if (FLidlJsonFilePath <> '') and FileExists(FLidlJsonFilePath) then
   begin
     TLogger.Info('Loading json from file %s', [FLidlJsonFilePath]);
@@ -283,6 +283,68 @@ begin
   TLogger.Debug('Loading JSON', []);
 
   DynArrayLoadJson(FLidlTickets, FLidlJson, TypeInfo(TLidlTicketArray));
+end;
+
+procedure TLidlToGrocy.ProcessLidlTicket(const Ticket: TTicket; const LidlTicket: TLidlTicket);
+var
+  LidlProduct: TItemsLine;
+  GrocyProduct: TGrocyProduct;
+begin
+  TLogger.InfoEnter('Started processing LIDL receipt (barcode %s)', [LidlTicket.BarCode]);
+
+  for LidlProduct in LidlTicket.ItemsLine do
+  begin
+    if (Ticket.ExistsStockedProduct(LidlProduct.CodeInput)) and
+      (Ticket.ExistsConsumedProduct(LidlProduct.CodeInput)) then
+    begin
+      TLogger.Info('Already processed product (barcode %s)', [LidlProduct.CodeInput]);
+      continue;
+    end;
+
+    TLogger.InfoEnter('Started processing item (barcode %s)', [LidlProduct.CodeInput]);
+
+    GrocyProduct := nil;
+    try
+      LidlProduct.FixQuantity;
+
+      GrocyProduct := GetGrocyProduct(LidlProduct);
+
+      if Assigned(GrocyProduct) then
+      begin
+        if not (Ticket.ExistsStockedProduct(LidlProduct.CodeInput)) then
+        begin
+          if AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket) then
+            Ticket.StockedProducts.Add(LidlProduct.CodeInput);
+        end
+        else
+          TLogger.Info('Product already added in Grocy Stock with this receipt', []);
+
+        if not (Ticket.ExistsConsumedProduct(LidlProduct.CodeInput)) then
+        begin
+          if ConsumeGrocyProduct(LidlProduct) then
+            Ticket.ConsumedProducts.Add(LidlProduct.CodeInput);
+        end
+        else
+          TLogger.Info('Product already consumed in Grocy with this receipt', []);
+      end;
+
+      FConfiguration.SaveTickets;
+    finally
+      if Assigned(GrocyProduct) then
+        GrocyProduct.Free;
+    end;
+    TLogger.InfoExit('Completed processing', []);
+  end;
+end;
+
+procedure TLidlToGrocy.DoRun;
+var
+  LidlTicket: TLidlTicket;
+  Ticket: TTicket;
+begin
+  CheckMandatoryParams;
+
+  LoadLidlJson;
 
   if (Length(FLidlTickets) = 0) then
     TLogger.Error('Invalid lidl json file', []);
@@ -297,43 +359,7 @@ begin
       FConfiguration.InsertTicket(Ticket);
     end;
 
-    TLogger.InfoEnter('Started processing LIDL receipt (barcode %s)', [LidlTicket.BarCode]);
-    for LidlProduct in LidlTicket.ItemsLine do
-    begin
-      TLogger.InfoEnter('Started processing item (barcode %s)', [LidlProduct.CodeInput]);
-      GrocyProduct := nil;
-      try
-        if TryStrToFloat(LidlProduct.Quantity, Value) and (frac(Value) <> 0) then
-          LidlProduct.Quantity := IntToStr(Ceil(Value));
-
-        GrocyProduct := GetGrocyProduct(LidlProduct);
-
-        if Assigned(GrocyProduct) then
-        begin
-          if (Ticket.StockedProducts.IndexOf(LidlProduct.CodeInput) = -1) then
-          begin
-            if AddGrocyProductInStock(LidlProduct, GrocyProduct, LidlTicket) then
-              Ticket.StockedProducts.Add(LidlProduct.CodeInput);
-          end
-          else
-            TLogger.Info('Product already added in Grocy Stock with this receipt', []);
-
-          if (Ticket.ConsumedProducts.IndexOf(LidlProduct.CodeInput) = -1) then
-          begin
-            if ConsumeGrocyProduct(LidlProduct) then
-              Ticket.ConsumedProducts.Add(LidlProduct.CodeInput);
-          end
-          else
-            TLogger.Info('Product already consumed in Grocy with this receipt', []);
-        end;
-
-        FConfiguration.SaveTickets;
-      finally
-        if Assigned(GrocyProduct) then
-          GrocyProduct.Free;
-      end;
-      TLogger.InfoExit('Completed processing', []);
-    end;
+    ProcessLidlTicket(Ticket, LidlTicket);
 
     FConfiguration.SaveConfig;
 
@@ -366,7 +392,7 @@ begin
 
   if Assigned(FLidlTickets) then
   begin
-    for I := 0 to Length(FLidlTickets) - 1 do
+    for I := Low(FLidlTickets) to High(FLidlTickets) do
       FLidlTickets[I].Free;
     SetLength(FLidlTickets, 0);
   end;

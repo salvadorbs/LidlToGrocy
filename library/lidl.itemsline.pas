@@ -5,7 +5,7 @@ unit Lidl.ItemsLine;
 interface
 
 uses
-  Classes, SysUtils, Lidl.Discounts, mormot.core.json;
+  Classes, SysUtils, Lidl.Discounts, mormot.core.json, Math;
 
 type
 
@@ -32,6 +32,8 @@ type
     property TaxGroupName: string read FTaxGroupName write FTaxGroupName;
   public
     destructor Destroy; override;
+
+    procedure FixQuantity;
   end;
 
   TItemsLineArray = array of TItemsLine;
@@ -43,6 +45,14 @@ implementation
 destructor TItemsLine.Destroy;
 begin
   inherited Destroy;
+end;
+
+procedure TItemsLine.FixQuantity;
+var
+  Value: Double;
+begin
+  if TryStrToFloat(FQuantity, Value) and (frac(Value) <> 0) then
+    FQuantity := IntToStr(Ceil(Value));
 end;
 
 end.

@@ -301,7 +301,7 @@ begin
 
       if Assigned(GrocyProducts) then
       begin
-        for I := 0 to Length(GrocyProducts) - 1 do
+        for I := Low(GrocyProducts) to High(GrocyProducts) do
           GrocyProducts[I].Free;
         SetLength(GrocyProducts, 0);
       end;

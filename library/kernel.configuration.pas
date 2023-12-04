@@ -109,6 +109,8 @@ begin
   FGrocyQuIdPurchase := 3;
   FGrocyQuIdConsume := 2;
   FGrocyQuIdPrice := 3;
+
+  FLidlTickets := nil;
 end;
 
 destructor TConfiguration.Destroy;
@@ -117,7 +119,7 @@ var
 begin
   if Assigned(FLidlTickets) then
   begin
-    for I := 0 to Length(FLidlTickets) - 1 do
+    for I := Low(FLidlTickets) to High(FLidlTickets) do
       FLidlTickets[I].Free;
     SetLength(FLidlTickets, 0);
   end;
